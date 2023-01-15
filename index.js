@@ -13,6 +13,15 @@ app.get('/', (req, res) => {
     res.send('Hello world')
 })
 
+app.get('/activity', (req, res) => {
+    connection.query(
+        'SELECT * FROM activity',
+        function(err, results, fields) {
+            res.send(results)
+        }
+    )
+})
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
