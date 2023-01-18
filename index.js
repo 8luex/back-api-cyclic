@@ -33,11 +33,17 @@ app.get('/activitys', (req, res) => {
     )
 })
 
-app.get('/studentconnect', (req, res) => {
+app.get('/studentconnect', jsonParser, (req, res) => {
+    var studentID = req.body.studentID
+    var studentPassword = req.body.studentPassword
+    var lineID = req.body.lineID
     connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty;',
-        function(err, results, fields) {
-            res.send(results)
+        'SELECT * FROM `student_connect` WHERE studentID = ?;',
+        [studentID],
+        function(err, student, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(student.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
+            res.json({status: 'ok', message: 'already connected'})
         }
     )
 })
