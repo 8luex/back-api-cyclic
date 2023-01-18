@@ -3,6 +3,8 @@ const cors = require('cors')
 const mysql = require('mysql2')
 require('dotenv').config()
 const app = express()
+const bodyParser = require('body-parser')
+const jsonParser = bodyParser.json()
 
 app.use(cors())
 
@@ -38,6 +40,11 @@ app.get('/studentconnect', (req, res) => {
             res.send(results)
         }
     )
+})
+
+app.post('/connect', jsonParser, (req, res) => {
+    var studentID = req.body.studentID
+    res.json({studentID})
 })
 
 app.get('/datas', (req, res) => {
