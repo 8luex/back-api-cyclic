@@ -51,10 +51,25 @@ app.post('/connect', jsonParser, (req, res) => {
         [studentID, lineID],
         function(err, results, fields) {
             if(err) {
-                res.json({status: 'error', message: err})
+                res.json({status: 'error', message: err});
                 return
             }
             res.json({status: 'ok'})
+        }
+    )
+})
+
+app.post('/login', jsonParser, (req, res) => {
+    var studentID = req.body.studentID
+    var studentPassword = req.body.studentPassword
+    var lineID = req.body.lineID
+    connection.query(
+        'SELECT * FROM `student` WEHERE `student`.`id` = ? AND `student`.`pass` = ?;',
+        [studentID, studentPassword],
+        function(err, student, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(student.length == 0) { res.json({status: 'error', message: 'connected failed'}); return }
+            res.json({status: 'ok', message: 'connected successfully'})
         }
     )
 })
