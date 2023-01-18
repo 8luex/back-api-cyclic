@@ -13,7 +13,7 @@ const connection = mysql.createConnection(process.env.DATABASE_URL)
 app.get('/', (req, res) => {
     console.log('Hello world')
     res.send('Hello world')
-})
+}) //done
 
 app.get('/activity', (req, res) => {
     connection.query(
@@ -33,7 +33,7 @@ app.get('/activitys', (req, res) => {
     )
 })
 
-app.get('/studentconnect', jsonParser, (req, res) => {
+app.post('/studentconnect', jsonParser, (req, res) => {
     var studentID = req.body.studentID
     var studentPassword = req.body.studentPassword
     var lineID = req.body.lineID
@@ -78,7 +78,7 @@ app.post('/login', jsonParser, (req, res) => {
             res.json({status: 'ok', message: 'connected successfully'})
         }
     )
-})
+}) //done
 
 app.get('/datas', (req, res) => {
     connection.query(
