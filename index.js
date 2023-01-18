@@ -48,7 +48,7 @@ app.post('/connect', jsonParser, (req, res) => {
     var lineID = req.body.lineID
     connection.query(
         'INSERT INTO `student_connect` (`studentID`, `lineID`) VALUES (?, ?);',
-        [studentID, studentPassword, lineID],
+        [studentID, lineID],
         function(err, results, fields) {
             if(err) {
                 res.json({status: 'error', message: err})
