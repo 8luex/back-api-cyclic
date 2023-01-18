@@ -52,11 +52,11 @@ app.post('/connect', jsonParser, (req, res) => {
         function(err, results, fields) {
             if(err) {
                 res.json({status: 'error', message: err})
+                return
             }
             res.json({status: 'ok'})
         }
     )
-    res.json({studentID})
 })
 
 app.get('/datas', (req, res) => {
