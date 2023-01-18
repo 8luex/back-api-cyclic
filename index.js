@@ -44,6 +44,18 @@ app.get('/studentconnect', (req, res) => {
 
 app.post('/connect', jsonParser, (req, res) => {
     var studentID = req.body.studentID
+    var studentPassword = req.body.studentPassword
+    var lineID = req.body.lineID
+    connection.query(
+        'INSERT INTO `student_connect` (`studentID`, `lineID`) VALUES (?, ?);',
+        [studentID, studentPassword, lineID],
+        function(err, results, fields) {
+            if(err) {
+                res.json({status: 'error', message: err})
+            }
+            res.json({status: 'ok'})
+        }
+    )
     res.json({studentID})
 })
 
@@ -58,3 +70,7 @@ app.get('/datas', (req, res) => {
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
+
+
+
+//UPDATE student_connect SET `lineID` = "ty" WHERE studentID = 6300196;
