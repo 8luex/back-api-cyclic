@@ -31,7 +31,7 @@ app.get('/activitys', (req, res) => {
     )
 })
 
-app.get('/activitys', (req, res) => {
+app.get('/studentconnect', (req, res) => {
     connection.query(
         'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty;',
         function(err, results, fields) {
