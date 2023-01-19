@@ -85,7 +85,7 @@ app.post('/loginx', jsonParser, (req, res) => {
     var studentPassword = req.body.studentPassword
     var lineID = req.body.lineID
     connection.query(
-        'SELECT * FROM `student` WHERE student.id = ?;',
+        'SELECT * FROM student WHERE id = ?;',
         [studentID],
         function(err, student, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
@@ -94,7 +94,7 @@ app.post('/loginx', jsonParser, (req, res) => {
                 return
             } else if(student.length == 1) {
                 connection.query(
-                    'SELECT * FROM `student` WHERE student.pass = ?;',
+                    'SELECT * FROM student WHERE pass = ?;',
                     [studentPassword],
                     function(e, p, f) {
                         if(e) { res.json({status: 'error', message: e}); return }
