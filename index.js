@@ -96,12 +96,12 @@ app.post('/loginx', jsonParser, (req, res) => {
                 connection.query(
                     'SELECT * FROM `student` WHERE student.pass = ?;',
                     [studentPassword],
-                    function(err, student, fields) {
-                        if(err) { res.json({status: 'error', message: err}); return }
-                        if(student.length == 0) {
+                    function(e, p, f) {
+                        if(e) { res.json({status: 'error', message: e}); return }
+                        if(p.length == 0) {
                             res.json({status: 'error', message: 'connected failed'});
                             return
-                        } else if(student.length == 1) {
+                        } else if(p.length == 1) {
                             res.json({status: 'ok', message: 'connected successfully'})
                         }
                     }
