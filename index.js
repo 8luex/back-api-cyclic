@@ -80,6 +80,38 @@ app.post('/login', jsonParser, (req, res) => {
     )
 }) //done
 
+app.post('/loginx', jsonParser, (req, res) => {
+    var studentID = req.body.studentID
+    var studentPassword = req.body.studentPassword
+    var lineID = req.body.lineID
+    connection.query(
+        'SELECT * FROM `student` WHERE student.id = ?;',
+        [studentID],
+        function(err, student, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(student.length == 0) {
+                res.json({status: 'error', message: 'connected failed'});
+                return
+            } else if(student.length == 1) {
+                connection.query(
+                    'SELECT * FROM `student` WHERE student.pass = ?;',
+                    [studentPassword],
+                    function(err, student, fields) {
+                        if(err) { res.json({status: 'error', message: err}); return }
+                        if(student.length == 0) {
+                            res.json({status: 'error', message: 'connected failed'});
+                            return
+                        } else if(student.length == 1) {
+                            res.json({status: 'ok', message: 'connected successfully'})
+                        }
+                    }
+                )
+            }
+            //res.json({status: 'ok', message: 'connected successfully'})
+        }
+    )
+}) //done
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
