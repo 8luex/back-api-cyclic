@@ -90,7 +90,7 @@ app.post('/loginx', jsonParser, (req, res) => {
         function(err, student, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             if(student.length == 0) {
-                res.json({status: 'error', message: 'connected failed'});
+                res.json({status: 'error', message: 'no student id'});
                 return
             } else if(student.length == 1) {
                 connection.query(
@@ -99,7 +99,7 @@ app.post('/loginx', jsonParser, (req, res) => {
                     function(e, p, f) {
                         if(e) { res.json({status: 'error', message: e}); return }
                         if(p.length == 0) {
-                            res.json({status: 'error', message: 'connected failed'});
+                            res.json({status: 'error', message: 'wrong password'});
                             return
                         } else if(p.length == 1) {
                             res.json({status: 'ok', message: 'connected successfully'})
