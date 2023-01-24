@@ -34,9 +34,9 @@ app.get('/activitys', (req, res) => {
 })
 
 app.post('/studentconnect', jsonParser, (req, res) => {
-    var studentID = req.body.studentID
-    var studentPassword = req.body.studentPassword
-    var lineID = req.body.lineID
+    let studentID = req.body.studentID
+    let studentPassword = req.body.studentPassword
+    let lineID = req.body.lineID
     connection.query(
         'SELECT * FROM `student_connect` WHERE studentID = ?;',
         [studentID],
@@ -49,9 +49,9 @@ app.post('/studentconnect', jsonParser, (req, res) => {
 })
 
 app.post('/connect', jsonParser, (req, res) => {
-    var studentID = req.body.studentID
-    var studentPassword = req.body.studentPassword
-    var lineID = req.body.lineID
+    let studentID = req.body.studentID
+    let studentPassword = req.body.studentPassword
+    let lineID = req.body.lineID
     connection.query(
         'INSERT INTO `student_connect` (`studentID`, `lineID`) VALUES (?, ?);',
         [studentID, lineID],
@@ -66,12 +66,12 @@ app.post('/connect', jsonParser, (req, res) => {
 })
 
 app.post('/login', jsonParser, (req, res) => {
-    var studentID = req.body.studentID
-    var studentPassword = req.body.studentPassword
-    var lineID = req.body.lineID
+    let studentID = req.body.studentID
+    let studentPassword = req.body.studentPassword
+    let lineID = req.body.lineID
+    let sql = `SELECT * FROM student WHERE id = '${studentID}' AND pass = '${studentPassword}'`;
     connection.query(
-        'SELECT * FROM `student` WHERE student.id = ?;',
-        [studentID, studentPassword],
+        sql,
         function(err, student, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             if(student.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
