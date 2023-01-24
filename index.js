@@ -68,7 +68,7 @@ app.post('/connect', jsonParser, (req, res) => {
 app.post('/login', jsonParser, (req, res) => {
     let studentID = req.body.studentID
     let studentPassword = req.body.studentPassword
-    let lineID = req.body.lineID
+    //let lineID = req.body.lineID
     let sql = `SELECT * FROM student WHERE id = '${studentID}' AND pass = '${studentPassword}'`;
     connection.query(
         sql,
