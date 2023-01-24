@@ -70,12 +70,12 @@ app.post('/login', jsonParser, (req, res) => {
     var studentPassword = req.body.studentPassword
     var lineID = req.body.lineID
     connection.query(
-        'SELECT * FROM `student` WHERE student.id = ? AND student.pass = ?;',
+        'SELECT * FROM `student` WHERE student.id = ?;',
         [studentID, studentPassword],
         function(err, student, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             if(student.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
-            res.json({status: 'ok', message: 'connected successfully'})
+            res.json({status: 'ok', message: 'connected successfully', student})
         }
     )
 }) //done
