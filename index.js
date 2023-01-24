@@ -68,7 +68,7 @@ app.post('/connect', jsonParser, (req, res) => {
 app.post('/login', jsonParser, (req, res) => {
     let studentID = req.body.studentID
     let studentPassword = req.body.studentPassword
-    if (studentID && studentPassword) {
+    //if (studentID && studentPassword) {
         connection.query(
             'SELECT * FROM student WHERE id = ? AND pass = ?;',
             [studentID, studentPassword],
@@ -78,7 +78,7 @@ app.post('/login', jsonParser, (req, res) => {
                 res.json({status: 'ok', message: 'connected successfully', student})
             }
         )
-    }
+    //}
 })
     // connection.query(
     //     'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
