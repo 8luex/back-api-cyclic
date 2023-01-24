@@ -79,7 +79,7 @@ app.post('/login', jsonParser, (req, res) => {
             }
         )
     }
-}
+})
     // connection.query(
     //     'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
     //     [studentID, studentPassword],
