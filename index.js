@@ -68,17 +68,27 @@ app.post('/connect', jsonParser, (req, res) => {
 app.post('/login', jsonParser, (req, res) => {
     let studentID = req.body.studentID
     let studentPassword = req.body.studentPassword
-    //let lineID = req.body.lineID
-    let sql = `SELECT * FROM student WHERE id = '${studentID}' AND pass = '${studentPassword}'`;
-    connection.query(
-        sql,
-        function(err, student, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(student.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
-            res.json({status: 'ok', message: 'connected successfully', student})
-        }
-    )
-}) //done
+    if (studentID && studentPassword) {
+        connection.query(
+            'SELECT * FROM student WHERE id = ? AND pass = ?;',
+            [studentID, studentPassword],
+            function(err, student, fields) {
+                if(err) { res.json({status: 'error', message: err}); return }
+                if (results.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
+                res.json({status: 'ok', message: 'connected successfully', student})
+            }
+        )
+    }
+}
+    // connection.query(
+    //     'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
+    //     [studentID, studentPassword],
+    //     function(err, student, fields) {
+    //         if(err) { res.json({status: 'error', message: err}); return }
+    //         if(student.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
+    //         res.json({status: 'ok', message: 'connected successfully', student})
+    //     }
+    // )
 
 app.get('/datas', (req, res) => {
     connection.query(
