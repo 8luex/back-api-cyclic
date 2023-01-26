@@ -33,16 +33,14 @@ app.get('/activitys', (req, res) => {
     )
 })
 
-app.post('/studentconnect', jsonParser, (req, res) => {
-    let studentID = req.body.studentID
-    let studentPassword = req.body.studentPassword
+app.post('/studentconnectcheck', jsonParser, (req, res) => {
     let lineID = req.body.lineID
     connection.query(
-        'SELECT * FROM `student_connect` WHERE studentID = ?;',
-        [studentID],
-        function(err, student, fields) {
+        'SELECT * FROM student_connect WHERE lineID = ?;',
+        [lineID],
+        function(err, line, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
-            if(student.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
+            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
             res.json({status: 'ok', message: 'already connected'})
         }
     )
