@@ -44,24 +44,35 @@ app.post('/studentconnectcheck', jsonParser, (req, res) => {
             res.json({status: 'ok', message: 'already connected'})
         }
     )
-})
+}) //done
 
-app.post('/connect', jsonParser, (req, res) => {
+app.post('/lineinsert', jsonParser, (req, res) => {
     let studentID = req.body.studentID
-    let studentPassword = req.body.studentPassword
     let lineID = req.body.lineID
     connection.query(
-        'INSERT INTO `student_connect` (`studentID`, `lineID`) VALUES (?, ?);',
-        [studentID, lineID],
+        'INSERT INTO student_connect (lineID, studentID) VALUES (?, ?);',
+        //INSERT INTO `student_connect` (`lineID`, `studentID`) VALUES ('test', '6300196');
+        [lineID, studentID],
         function(err, results, fields) {
-            if(err) {
-                res.json({status: 'error', message: err});
-                return
-            }
-            res.json({status: 'ok'})
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.json({status: 'ok', message: 'insert complete'})
         }
     )
-})
+}) //
+
+app.put('/lineupdate', jsonParser, (req, res) => {
+    let studentID = req.body.studentID
+    let lineID = req.body.lineID
+    connection.query(
+        'UPDATE student_connect SET studentID=? WHERE lineID=?;',
+        [studentID, lineID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.affectedRows === 0) { res.json({status: 'error', message: 'no lineID found'}); return }
+            res.json({status: 'ok', message: 'update complete'})
+        }
+    )
+}) //
 
 app.post('/login', jsonParser, (req, res) => {
     let studentID = req.body.studentID
