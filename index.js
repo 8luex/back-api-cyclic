@@ -33,6 +33,19 @@ app.get('/activitys', (req, res) => {
     )
 })
 
+app.post('/studentdisconnectcheck', jsonParser, (req, res) => {
+    let lineID = req.body.lineID
+    connection.query(
+        'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
+        [lineID],
+        function(err, line, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
+            res.json({status: 'ok', message: 'already connected'})
+        }
+    )
+}) //done
+
 app.post('/studentconnectcheck', jsonParser, (req, res) => {
     let lineID = req.body.lineID
     connection.query(
