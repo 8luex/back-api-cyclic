@@ -41,7 +41,7 @@ app.post('/studentdisconnectcheck', jsonParser, (req, res) => {
         function(err, line, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
-            res.json({status: 'ok', message: 'already connected'})
+            //res.json({status: 'ok', message: 'already connected'})
             res.send(line)
         }
     )
