@@ -34,7 +34,7 @@ app.get('/activitys', (req, res) => {
 })
 
 app.get('/studentgetconnectcheck/:lineID', jsonParser, (req, res) => {
-    let lineID = req.body.lineID
+    let lineID = req.params.lineID
     connection.query(
         'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
         [lineID],
