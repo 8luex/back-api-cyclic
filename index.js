@@ -40,7 +40,7 @@ app.get('/activitysavailable/:studentID', (req, res) => {
         [studentID],
         function(err, results, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
-            if(results.affectedRows == 0) { res.json({status: 'ok', message: 'no activitys available'}); return }
+            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys available'}); return }
             res.send(results)
         }
     )
