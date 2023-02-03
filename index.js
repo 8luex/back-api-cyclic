@@ -33,6 +33,17 @@ app.get('/activitys', (req, res) => {
     )
 })
 
+app.get('/activitysavailable/:lineID', (req, res) => {
+    let studentID = req.params.studentID
+    connection.query(
+        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id NOT IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID=?);',
+        [studentID],
+        function(err, results, fields) {
+            res.send(results)
+        }
+    )
+}) //process
+
 app.get('/studentgetconnectcheck/:lineID', jsonParser, (req, res) => {
     let lineID = req.params.lineID
     connection.query(
@@ -130,3 +141,9 @@ app.listen(process.env.PORT || 3000)
 
 
 //UPDATE student_connect SET `lineID` = "ty" WHERE studentID = 6300196;
+//SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty,activity_status.studentID AS studentID
+//FROM `activity` 
+//JOIN teacher ON creator = teacher.id 
+//JOIN faculty ON faculty.id = teacher.faculty
+//JOIN activity_status ON activity.id = activity_status.activityID
+//WHERE activity_status.studentID = 6300195
