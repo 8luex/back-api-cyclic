@@ -128,6 +128,19 @@ app.post('/login', jsonParser, (req, res) => {
     )
 }) //done
 
+app.post('/activityenroll', jsonParser, (req, res) => {
+    let activityID = req.body.activityID
+    let studentID = req.body.studentID
+    connection.query(
+        'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
+        [activityID, studentID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.json({status: 'ok', message: 'activity enroll successfully'})
+        }
+    )
+}) //done
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
@@ -149,3 +162,5 @@ app.listen(process.env.PORT || 3000)
 //JOIN faculty ON faculty.id = teacher.faculty
 //JOIN activity_status ON activity.id = activity_status.activityID
 //WHERE activity_status.studentID = 6300195
+
+//INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES ('', '', 0, current_timestamp(), NULL)
