@@ -44,6 +44,19 @@ app.get('/activitysavailable/:studentID', (req, res) => {
             res.send(results)
         }
     )
+}) //done
+
+app.get('/activitysalreadyenroll/:studentID', (req, res) => {
+    let studentID = req.params.studentID
+    connection.query(
+        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID=?);',
+        [studentID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys enroll'}); return }
+            res.send(results)
+        }
+    )
 }) //process
 
 app.get('/studentgetconnectcheck/:lineID', jsonParser, (req, res) => {
