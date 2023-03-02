@@ -84,6 +84,20 @@ app.post('/studentdisconnectcheck', jsonParser, (req, res) => {
     )
 }) //done
 
+app.post('/teacherdisconnectcheck', jsonParser, (req, res) => {
+    let lineID = req.body.lineID
+    connection.query(
+        'SELECT teacher_connect.lineID, student_connect.teacherID, teacher.fname, teacher.lname, faculty.name AS faculty FROM teacher_connect JOIN teacher ON teacherID = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE lineID=?;',
+        [lineID],
+        function(err, line, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
+            res.json({status: 'ok', message: 'already connected', line})
+            //res.send(line)
+        }
+    )
+}) //done teacher
+
 app.post('/studentconnectcheck', jsonParser, (req, res) => {
     let lineID = req.body.lineID
     connection.query(
@@ -96,6 +110,19 @@ app.post('/studentconnectcheck', jsonParser, (req, res) => {
         }
     )
 }) //done
+
+app.post('/teacherconnectcheck', jsonParser, (req, res) => {
+    let lineID = req.body.lineID
+    connection.query(
+        'SELECT * FROM teacher_connect WHERE lineID = ?;',
+        [lineID],
+        function(err, line, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
+            res.json({status: 'ok', message: 'already connected'})
+        }
+    )
+}) //done teacher
 
 app.post('/lineinsert', jsonParser, (req, res) => {
     let studentID = req.body.studentID
@@ -111,6 +138,19 @@ app.post('/lineinsert', jsonParser, (req, res) => {
     )
 }) //
 
+app.post('/teacherlineinsert', jsonParser, (req, res) => {
+    let teacherID = req.body.teacherID
+    let lineID = req.body.lineID
+    connection.query(
+        'INSERT INTO teacher_connect (lineID, teacherID) VALUES (?, ?);',
+        [lineID, teacherID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.json({status: 'ok', message: 'insert complete'})
+        }
+    )
+}) //teacher
+
 app.put('/lineupdate', jsonParser, (req, res) => {
     let studentID = req.body.studentID
     let lineID = req.body.lineID
@@ -124,6 +164,20 @@ app.put('/lineupdate', jsonParser, (req, res) => {
         }
     )
 }) //
+
+app.put('/teacherlineupdate', jsonParser, (req, res) => {
+    let studentID = req.body.studentID
+    let lineID = req.body.lineID
+    connection.query(
+        'UPDATE teacher_connect SET teacherID=? WHERE lineID=?;',
+        [studentID, lineID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.affectedRows === 0) { res.json({status: 'error', message: 'no lineID found'}); return }
+            res.json({status: 'ok', message: 'update complete'})
+        }
+    )
+}) //teacher
 
 app.post('/login', jsonParser, (req, res) => {
     let studentID = req.body.studentID
@@ -141,6 +195,21 @@ app.post('/login', jsonParser, (req, res) => {
     )
 }) //done
 
+app.post('/teacherlogin', jsonParser, (req, res) => {
+    let teacherID = req.body.teacherID
+    let teacherPassword = req.body.teacherPassword
+    let lineID = req.body.lineID
+    connection.query(
+        'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
+        [teacherID, teacherPassword],
+        function(err, teacher, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(teacher.length == 0) { res.json({status: 'error', message: 'connected failed', teacher}); return }
+            res.json({status: 'ok', message: 'connected successfully', teacher})
+        }
+    )
+}) //done teacher
+
 app.post('/activityenroll', jsonParser, (req, res) => {
     let activityID = req.body.activityID
     let studentID = req.body.studentID
@@ -153,6 +222,29 @@ app.post('/activityenroll', jsonParser, (req, res) => {
         }
     )
 }) //done
+
+app.post('/activitycreate', jsonParser, (req, res) => {
+    let creator = req.body.creator
+    let name = req.body.name
+    let detail = req.body.detail
+    let location = req.body.location
+    let eventDate = req.body.eventDate
+    let timeStart = req.body.timeStart
+    let timeEnd = req.body.timeEnd
+    let hoursToReceive = req.body.hoursToReceive
+    let image = req.body.image
+    let year = req.body.year
+    let semester = req.body.semester
+    let max = req.body.max
+    connection.query(
+        'INSERT INTO activity (creator, name, detail, createdAt, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max) VALUES (?, ?, ?, current_timestamp(), ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+        [creator, name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.json({status: 'ok', message: 'activity enroll successfully'})
+        }
+    )
+}) //waiting test
 
 app.get('/datas', (req, res) => {
     connection.query(
