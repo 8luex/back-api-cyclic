@@ -87,7 +87,7 @@ app.post('/studentdisconnectcheck', jsonParser, (req, res) => {
 app.post('/teacherdisconnectcheck', jsonParser, (req, res) => {
     let lineID = req.body.lineID
     connection.query(
-        'SELECT teacher_connect.lineID, student_connect.teacherID, teacher.fname, teacher.lname, faculty.name AS faculty FROM teacher_connect JOIN teacher ON teacherID = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE lineID=?;',
+        'SELECT teacher_connect.lineID, teacher_connect.teacherID, teacher.fname, teacher.lname, faculty.name AS faculty FROM teacher_connect JOIN teacher ON teacherID = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE lineID=?;',
         [lineID],
         function(err, line, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
@@ -166,7 +166,7 @@ app.put('/lineupdate', jsonParser, (req, res) => {
 }) //
 
 app.put('/teacherlineupdate', jsonParser, (req, res) => {
-    let studentID = req.body.studentID
+    let teacherID = req.body.teacherID
     let lineID = req.body.lineID
     connection.query(
         'UPDATE teacher_connect SET teacherID=? WHERE lineID=?;',
@@ -198,7 +198,6 @@ app.post('/login', jsonParser, (req, res) => {
 app.post('/teacherlogin', jsonParser, (req, res) => {
     let teacherID = req.body.teacherID
     let teacherPassword = req.body.teacherPassword
-    let lineID = req.body.lineID
     connection.query(
         'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
         [teacherID, teacherPassword],
