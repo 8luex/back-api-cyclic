@@ -222,6 +222,19 @@ app.post('/activityenroll', jsonParser, (req, res) => {
     )
 }) //done
 
+app.post('/creatactivity', jsonParser, (req, res) => {
+    let activityID = req.body.activityID
+    let studentID = req.body.studentID
+    connection.query(
+        'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
+        [activityID, studentID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.json({status: 'ok', message: 'activity enroll successfully'})
+        }
+    )
+}) //processing
+
 app.post('/activitycreate', jsonParser, (req, res) => {
     let creator = req.body.creator
     let name = req.body.name
@@ -243,7 +256,7 @@ app.post('/activitycreate', jsonParser, (req, res) => {
             res.json({status: 'ok', message: 'activity enroll successfully'})
         }
     )
-}) //waiting test
+}) //done create teacher
 
 app.get('/datas', (req, res) => {
     connection.query(
