@@ -258,6 +258,15 @@ app.post('/activitycreate', jsonParser, (req, res) => {
     )
 }) //done create teacher
 
+app.get('/countenroll', (req, res) => {
+    connection.query(
+        'SELECT COUNT(*) FROM activity_status WHERE activityID = 1;',
+        function(err, results, fields) {
+            res.send(results)
+        }
+    )
+}) //count enroll per activity
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
