@@ -295,6 +295,20 @@ app.get('/countenroll/:activityID', (req, res) => {
     )
 }) //count enroll per activity
 
+app.put('/setactivitystatustrue', jsonParser, (req, res) => {
+    let activityID = req.body.activityID
+    let studentID = req.body.studentID
+    connection.query(
+        'UPDATE activity_status SET status = 1, timeJoin = current_timestamp() WHERE activityID = ? AND studentID = ?;',
+        [activityID, studentID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.affectedRows === 0) { res.json({status: 'error', message: 'affected Rows is 0'}); return }
+            res.json({status: 'ok', message: 'update activity true complete'})
+        }
+    )
+}) // set activity_status = 1
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
@@ -318,3 +332,4 @@ app.listen(process.env.PORT || 3000)
 //WHERE activity_status.studentID = 6300195
 
 //INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES ('', '', 0, current_timestamp(), NULL)
+//UPDATE activity_status SET status = 1, timeJoin = 'Frankfurt' WHERE CustomerID = 1;
