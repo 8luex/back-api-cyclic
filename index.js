@@ -248,6 +248,19 @@ app.post('/activityenroll', jsonParser, (req, res) => {
     )
 }) //done
 
+app.get('/whoenroll/:activityID', (req, res) => {
+    let activityID = req.params.activityID
+    connection.query(
+        'SELECT activityID, studentID, student.fname, student.lname, faculty.name AS faculty, status FROM activity_status JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE activityID = ?;',
+        [activityID],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.length == 0) { res.json({status: 'ok', message: 'no one enroll'}); return }
+            res.send(results)
+        }
+    )
+}) //done
+
 app.post('/creatactivity', jsonParser, (req, res) => {
     let activityID = req.body.activityID
     let studentID = req.body.studentID
