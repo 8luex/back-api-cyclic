@@ -322,6 +322,20 @@ app.put('/setactivitystatustrue', jsonParser, (req, res) => {
     )
 }) // set activity_status = 1
 
+app.post('/adminlogin', jsonParser, (req, res) => {
+    let user = req.body.user
+    let pass = req.body.pass
+    connection.query(
+        'SELECT * FROM admin WHERE user = ? AND pass = ?;',
+        [user, pass],
+        function(err, result, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(result.length == 0) { res.json({status: 'error', message: 'login failed', result}); return }
+            res.json({status: 'ok', message: 'login successfully', result})
+        }
+    )
+}) //done admin login
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
