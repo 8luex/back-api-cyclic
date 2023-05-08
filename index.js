@@ -341,8 +341,13 @@ app.post('/adminlogin', jsonParser, (req, res) => {
 }) //done admin login
 
 app.post('/authen', jsonParser, (req, res) => {
-    const token = req.headers.authorization.split(' ')[1]
-    res.json({ token })
+    try {
+        const token = req.headers.authorization.split(' ')[1]
+        let decoded = jwt.verify(token, secret)
+        res.json({status: 'ok', decoded})
+    } catch(err) {
+        res.json({status: 'error', message: err.message})
+    }
 }) //done jwt authen
 
 app.get('/datas', (req, res) => {
