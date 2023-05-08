@@ -341,7 +341,7 @@ app.post('/adminlogin', jsonParser, (req, res) => {
 }) //done admin login
 
 app.post('/authen', jsonParser, (req, res) => {
-    const token = req.headers.authorization
+    const token = req.headers.authorization.split(' ')[1]
     res.json({ token })
 }) //done jwt authen
 
