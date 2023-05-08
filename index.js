@@ -6,6 +6,9 @@ const app = express()
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 
+const jwt = require('jsonwebtoken')
+const secret = 'linebluezo'
+
 app.use(cors())
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
@@ -331,10 +334,16 @@ app.post('/adminlogin', jsonParser, (req, res) => {
         function(err, result, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             if(result.length == 0) { res.json({status: 'error', message: 'login failed', result}); return }
-            res.json({status: 'ok', message: 'login successfully', result})
+            let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
+            res.json({status: 'ok', message: 'login successfully', result, token})
         }
     )
 }) //done admin login
+
+app.post('/authen', jsonParser, (req, res) => {
+    const token = req.headers.authorization
+    res.json({ token })
+}) //done jwt authen
 
 app.get('/datas', (req, res) => {
     connection.query(
