@@ -29,7 +29,7 @@ app.get('/activity', (req, res) => {
 
 app.get('/activitys', (req, res) => {
     connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty ORDER BY activity.id DESC;',
+        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty ORDER BY activity.id DESC;',
         function(err, results, fields) {
             res.send(results)
         }
