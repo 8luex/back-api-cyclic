@@ -374,6 +374,28 @@ app.post('/authen', jsonParser, (req, res) => {
     }
 }) //done jwt authen
 
+app.put('/editactivity', jsonParser, (req, res) => {
+    let name = req.body.name
+    let detail = req.body.detail
+    let location = req.body.location
+    let eventDate = req.body.eventDate
+    let timeStart = req.body.timeStart
+    let timeEnd = req.body.timeEnd
+    let hoursToReceive = req.body.hoursToReceive
+    let image = req.body.image
+    let max = req.body.max
+    let id = req.body.id
+    connection.query(
+        'UPDATE activity SET name = ?, detail = ?, location = ?, eventDate = ?, timeStart = ?, timeEnd = ?, hoursToReceive = ?, image = ?, max = ? WHERE activity.id = ?;',
+        [name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, max, id],
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            if(results.affectedRows === 0) { res.json({status: 'error', message: 'affected Rows is 0'}); return }
+            res.json({status: 'ok', message: 'update activity complete'})
+        }
+    )
+}) // 
+
 app.get('/datas', (req, res) => {
     connection.query(
         'SELECT * FROM faculty',
