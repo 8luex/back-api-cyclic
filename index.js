@@ -89,7 +89,7 @@ app.get('/teachercreated/:teacherID', (req, res) => {
 }) //teacher created
 
 app.get('/teacheredit/:activityID', (req, res) => {
-    let activityID = req.params.teacherID
+    let activityID = req.params.activityID
     connection.query(
         'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ?;',
         [activityID],
