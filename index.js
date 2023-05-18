@@ -36,6 +36,17 @@ app.get('/activitys', (req, res) => {
     )
 })
 
+app.get('/activitys/:activityID', (req, res) => {
+    let activityID = req.params.activityID
+    connection.query(
+        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ? ORDER BY activity.id DESC;',
+        [activityID],
+        function(err, results, fields) {
+            res.send(results)
+        }
+    )
+}) //activitys get just 1
+
 // app.get('/activitysavailable/:studentID', (req, res) => {
 //     let studentID = req.params.studentID
 //     connection.query(
