@@ -31,6 +31,7 @@ app.get('/activitys', (req, res) => {
     connection.query(
         'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty ORDER BY activity.id DESC;',
         function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
             res.send(results)
         }
     )
@@ -42,6 +43,7 @@ app.get('/activitys/:activityID', (req, res) => {
         'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ? ORDER BY activity.id DESC;',
         [activityID],
         function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
             res.send(results)
         }
     )
@@ -395,6 +397,16 @@ app.put('/editactivity', jsonParser, (req, res) => {
         }
     )
 }) // 
+
+app.get('/teachers', (req, res) => {
+    connection.query(
+        'SELECT teacher.id,teacher.fname,teacher.lname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity WHERE creator = teacher.id) AS countactivity FROM `teacher` JOIN faculty ON faculty.id = teacher.faculty;',
+        function(err, results, fields) {
+            if(err) { res.json({status: 'error', message: err}); return }
+            res.send(results)
+        }
+    )
+}) // teacher list
 
 app.get('/datas', (req, res) => {
     connection.query(
