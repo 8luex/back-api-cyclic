@@ -410,7 +410,7 @@ app.get('/teachers', (req, res) => {
 
 app.get('/students', (req, res) => {
     connection.query(
-        'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty;',
+        'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id AND activity_status.status = 1)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty;',
         function(err, results, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
             res.send(results)
