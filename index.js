@@ -96,11 +96,11 @@ app.get('/activitysalreadyenroll/:studentID', (req, res) => {
         +'teacher.lname AS teacherlname,'
         +'faculty.name AS faculty,'
         +'status, timeEnroll, timeJoin, studentID'
-        +'FROM activity_status'
-        +'JOIN activity ON activityID = activity.id'
-        +'JOIN teacher ON creator = teacher.id'
-        +'JOIN faculty ON faculty.id = teacher.faculty'
-        +'WHERE studentID = ?;',
+        +' FROM activity_status'
+        +' JOIN activity ON activityID = activity.id'
+        +' JOIN teacher ON creator = teacher.id'
+        +' JOIN faculty ON faculty.id = teacher.faculty'
+        +' WHERE studentID = ?;',
         [studentID],
         function(err, results, fields) {
             if(err) { res.json({status: 'error', message: err}); return }
