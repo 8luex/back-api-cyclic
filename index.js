@@ -14,39 +14,42 @@ app.use(cors())
 const connection = mysql.createConnection(process.env.DATABASE_URL)
 
 app.get('/', (req, res) => {
-    console.log('Hello world')
-    res.send('Hello world')
+  console.log('Hello world')
+  res.send('Hello world')
 }) //done
 
 app.get('/activity', (req, res) => {
-    connection.query(
-        'SELECT * FROM activity',
-        function(err, results, fields) {
-            res.send(results)
-        }
-    )
+  connection.query('SELECT * FROM activity', function (err, results, fields) {
+    res.send(results)
+  })
 })
 
 app.get('/activitys', (req, res) => {
-    connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty ORDER BY activity.id DESC;',
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.send(results)
-        }
-    )
+  connection.query(
+    'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty ORDER BY activity.id DESC;',
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.send(results)
+    }
+  )
 })
 
 app.get('/activitys/:activityID', (req, res) => {
-    let activityID = req.params.activityID
-    connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ? ORDER BY activity.id DESC;',
-        [activityID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.send(results)
-        }
-    )
+  let activityID = req.params.activityID
+  connection.query(
+    'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ? ORDER BY activity.id DESC;',
+    [activityID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //activitys get just 1
 
 // app.get('/activitysavailable/:studentID', (req, res) => {
@@ -63,16 +66,22 @@ app.get('/activitys/:activityID', (req, res) => {
 // })
 
 app.get('/activitysavailable/:studentID', (req, res) => {
-    let studentID = req.params.studentID
-    connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty,(SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id ) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id NOT IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID=?);',
-        [studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys available'}); return }
-            res.send(results)
-        }
-    )
+  let studentID = req.params.studentID
+  connection.query(
+    'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty,(SELECT COUNT(*) FROM activity_status WHERE activityID = activity.id ) AS countenroll FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id NOT IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID=?);',
+    [studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.length == 0) {
+        res.json({ status: 'ok', message: 'no activitys available' })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //done
 
 // app.get('/activitysalreadyenroll/:studentID', (req, res) => {
@@ -89,386 +98,464 @@ app.get('/activitysavailable/:studentID', (req, res) => {
 // }) //done old
 
 app.get('/activitysalreadyenroll/:studentID', (req, res) => {
-    let studentID = req.params.studentID
-    connection.query(
-        'SELECT activityID AS id, teacher.id AS creator, activity.name, activity.detail, activity.createdAt, activity.location, activity.eventDate, activity.timeStart, activity.timeEnd, activity.hoursToReceive, activity.image, activity.year, activity.semester, activity.max,'
-        +'teacher.fname AS teacherfname,'
-        +'teacher.lname AS teacherlname,'
-        +'faculty.name AS faculty,'
-        +'status, timeEnroll, timeJoin, studentID'
-        +' FROM activity_status'
-        +' JOIN activity ON activityID = activity.id'
-        +' JOIN teacher ON creator = teacher.id'
-        +' JOIN faculty ON faculty.id = teacher.faculty'
-        +' WHERE studentID = ?;',
-        [studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys enroll'}); return }
-            res.send(results)
-        }
-    )
+  let studentID = req.params.studentID
+  connection.query(
+    'SELECT activityID AS id, teacher.id AS creator, activity.name, activity.detail, activity.createdAt, activity.location, activity.eventDate, activity.timeStart, activity.timeEnd, activity.hoursToReceive, activity.image, activity.year, activity.semester, activity.max,' +
+      'teacher.fname AS teacherfname,' +
+      'teacher.lname AS teacherlname,' +
+      'faculty.name AS faculty,' +
+      'status, timeEnroll, timeJoin, studentID' +
+      ' FROM activity_status' +
+      ' JOIN activity ON activityID = activity.id' +
+      ' JOIN teacher ON creator = teacher.id' +
+      ' JOIN faculty ON faculty.id = teacher.faculty' +
+      ' WHERE studentID = ?;',
+    [studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.length == 0) {
+        res.json({ status: 'ok', message: 'no activitys enroll' })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //done old
 
 app.get('/teachercreated/:teacherID', (req, res) => {
-    let teacherID = req.params.teacherID
-    connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.creator = ?;',
-        [teacherID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys created'}); return }
-            res.send(results)
-        }
-    )
+  let teacherID = req.params.teacherID
+  connection.query(
+    'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.creator = ?;',
+    [teacherID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.length == 0) {
+        res.json({ status: 'ok', message: 'no activitys created' })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //teacher created
 
 app.get('/teacheredit/:activityID', (req, res) => {
-    let activityID = req.params.activityID
-    connection.query(
-        'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ?;',
-        [activityID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.length == 0) { res.json({status: 'ok', message: 'no activitys created'}); return }
-            res.send(results)
-        }
-    )
+  let activityID = req.params.activityID
+  connection.query(
+    'SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty FROM `activity` JOIN teacher ON creator = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE activity.id = ?;',
+    [activityID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.length == 0) {
+        res.json({ status: 'ok', message: 'no activitys created' })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //teacher edit
 
 app.get('/studentgetconnectcheck/:lineID', jsonParser, (req, res) => {
-    let lineID = req.params.lineID
-    connection.query(
-        'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
-        [lineID],
-        function(err, results, fields) {
-            res.send(results)
-        }
-    )
+  let lineID = req.params.lineID
+  connection.query(
+    'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
+    [lineID],
+    function (err, results, fields) {
+      res.send(results)
+    }
+  )
 }) //done likely studentdisconnectcheck
 
 app.post('/studentdisconnectcheck', jsonParser, (req, res) => {
-    let lineID = req.body.lineID
-    connection.query(
-        'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
-        [lineID],
-        function(err, line, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
-            res.json({status: 'ok', message: 'already connected', line})
-            //res.send(line)
-        }
-    )
+  let lineID = req.body.lineID
+  connection.query(
+    'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname, faculty.name AS faculty FROM student_connect JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE lineID=?;',
+    [lineID],
+    function (err, line, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (line.length == 0) {
+        res.json({ status: 'ok', message: 'not yet connected' })
+        return
+      }
+      res.json({ status: 'ok', message: 'already connected', line })
+      //res.send(line)
+    }
+  )
 }) //done
 
 app.post('/teacherdisconnectcheck', jsonParser, (req, res) => {
-    let lineID = req.body.lineID
-    connection.query(
-        'SELECT teacher_connect.lineID, teacher_connect.teacherID, teacher.fname, teacher.lname, faculty.name AS faculty FROM teacher_connect JOIN teacher ON teacherID = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE lineID=?;',
-        [lineID],
-        function(err, line, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
-            res.json({status: 'ok', message: 'already connected', line})
-            //res.send(line)
-        }
-    )
+  let lineID = req.body.lineID
+  connection.query(
+    'SELECT teacher_connect.lineID, teacher_connect.teacherID, teacher.fname, teacher.lname, faculty.name AS faculty FROM teacher_connect JOIN teacher ON teacherID = teacher.id JOIN faculty ON faculty.id = teacher.faculty WHERE lineID=?;',
+    [lineID],
+    function (err, line, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (line.length == 0) {
+        res.json({ status: 'ok', message: 'not yet connected' })
+        return
+      }
+      res.json({ status: 'ok', message: 'already connected', line })
+      //res.send(line)
+    }
+  )
 }) //done teacher
 
 app.post('/studentconnectcheck', jsonParser, (req, res) => {
-    let lineID = req.body.lineID
-    connection.query(
-        'SELECT * FROM student_connect WHERE lineID = ?;',
-        [lineID],
-        function(err, line, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
-            res.json({status: 'ok', message: 'already connected'})
-        }
-    )
+  let lineID = req.body.lineID
+  connection.query('SELECT * FROM student_connect WHERE lineID = ?;', [lineID], function (err, line, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    if (line.length == 0) {
+      res.json({ status: 'ok', message: 'not yet connected' })
+      return
+    }
+    res.json({ status: 'ok', message: 'already connected' })
+  })
 }) //done
 
 app.post('/teacherconnectcheck', jsonParser, (req, res) => {
-    let lineID = req.body.lineID
-    connection.query(
-        'SELECT * FROM teacher_connect WHERE lineID = ?;',
-        [lineID],
-        function(err, line, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(line.length == 0) { res.json({status: 'ok', message: 'not yet connected'}); return }
-            res.json({status: 'ok', message: 'already connected'})
-        }
-    )
+  let lineID = req.body.lineID
+  connection.query('SELECT * FROM teacher_connect WHERE lineID = ?;', [lineID], function (err, line, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    if (line.length == 0) {
+      res.json({ status: 'ok', message: 'not yet connected' })
+      return
+    }
+    res.json({ status: 'ok', message: 'already connected' })
+  })
 }) //done teacher
 
 app.post('/lineinsert', jsonParser, (req, res) => {
-    let studentID = req.body.studentID
-    let lineID = req.body.lineID
-    connection.query(
-        'INSERT INTO student_connect (lineID, studentID) VALUES (?, ?);',
-        //INSERT INTO `student_connect` (`lineID`, `studentID`) VALUES ('test', '6300196');
-        [lineID, studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.json({status: 'ok', message: 'insert complete'})
-        }
-    )
+  let studentID = req.body.studentID
+  let lineID = req.body.lineID
+  connection.query(
+    'INSERT INTO student_connect (lineID, studentID) VALUES (?, ?);',
+    //INSERT INTO `student_connect` (`lineID`, `studentID`) VALUES ('test', '6300196');
+    [lineID, studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.json({ status: 'ok', message: 'insert complete' })
+    }
+  )
 }) //
 
 app.post('/teacherlineinsert', jsonParser, (req, res) => {
-    let teacherID = req.body.teacherID
-    let lineID = req.body.lineID
-    connection.query(
-        'INSERT INTO teacher_connect (lineID, teacherID) VALUES (?, ?);',
-        [lineID, teacherID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.json({status: 'ok', message: 'insert complete'})
-        }
-    )
+  let teacherID = req.body.teacherID
+  let lineID = req.body.lineID
+  connection.query('INSERT INTO teacher_connect (lineID, teacherID) VALUES (?, ?);', [lineID, teacherID], function (err, results, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    res.json({ status: 'ok', message: 'insert complete' })
+  })
 }) //teacher
 
 app.put('/lineupdate', jsonParser, (req, res) => {
-    let studentID = req.body.studentID
-    let lineID = req.body.lineID
-    connection.query(
-        'UPDATE student_connect SET studentID=? WHERE lineID=?;',
-        [studentID, lineID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.affectedRows === 0) { res.json({status: 'error', message: 'no lineID found'}); return }
-            res.json({status: 'ok', message: 'update complete'})
-        }
-    )
+  let studentID = req.body.studentID
+  let lineID = req.body.lineID
+  connection.query('UPDATE student_connect SET studentID=? WHERE lineID=?;', [studentID, lineID], function (err, results, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    if (results.affectedRows === 0) {
+      res.json({ status: 'error', message: 'no lineID found' })
+      return
+    }
+    res.json({ status: 'ok', message: 'update complete' })
+  })
 }) //
 
 app.put('/teacherlineupdate', jsonParser, (req, res) => {
-    let teacherID = req.body.teacherID
-    let lineID = req.body.lineID
-    connection.query(
-        'UPDATE teacher_connect SET teacherID=? WHERE lineID=?;',
-        [studentID, lineID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.affectedRows === 0) { res.json({status: 'error', message: 'no lineID found'}); return }
-            res.json({status: 'ok', message: 'update complete'})
-        }
-    )
+  let teacherID = req.body.teacherID
+  let lineID = req.body.lineID
+  connection.query('UPDATE teacher_connect SET teacherID=? WHERE lineID=?;', [teacherID, lineID], function (err, results, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    if (results.affectedRows === 0) {
+      res.json({ status: 'error', message: 'no lineID found' })
+      return
+    }
+    res.json({ status: 'ok', message: 'update complete' })
+  })
 }) //teacher
 
 app.post('/login', jsonParser, (req, res) => {
-    let studentID = req.body.studentID
-    let studentPassword = req.body.studentPassword
-    let lineID = req.body.lineID
-    connection.query(
-        //'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
-        'SELECT student.id, student.fname, student.lname, student.pass, faculty.name AS faculty FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ? AND student.pass = ?;',
-        [studentID, studentPassword],
-        function(err, student, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(student.length == 0) { res.json({status: 'error', message: 'connected failed', student}); return }
-            res.json({status: 'ok', message: 'connected successfully', student})
-        }
-    )
+  let studentID = req.body.studentID
+  let studentPassword = req.body.studentPassword
+  let lineID = req.body.lineID
+  connection.query(
+    //'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
+    'SELECT student.id, student.fname, student.lname, student.pass, faculty.name AS faculty FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ? AND student.pass = ?;',
+    [studentID, studentPassword],
+    function (err, student, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (student.length == 0) {
+        res.json({ status: 'error', message: 'connected failed', student })
+        return
+      }
+      res.json({ status: 'ok', message: 'connected successfully', student })
+    }
+  )
 }) //done
 
 app.post('/teacherlogin', jsonParser, (req, res) => {
-    let teacherID = req.body.teacherID
-    let teacherPassword = req.body.teacherPassword
-    connection.query(
-        'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
-        [teacherID, teacherPassword],
-        function(err, teacher, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(teacher.length == 0) { res.json({status: 'error', message: 'connected failed', teacher}); return }
-            res.json({status: 'ok', message: 'connected successfully', teacher})
-        }
-    )
+  let teacherID = req.body.teacherID
+  let teacherPassword = req.body.teacherPassword
+  connection.query(
+    'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
+    [teacherID, teacherPassword],
+    function (err, teacher, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (teacher.length == 0) {
+        res.json({ status: 'error', message: 'connected failed', teacher })
+        return
+      }
+      res.json({ status: 'ok', message: 'connected successfully', teacher })
+    }
+  )
 }) //done teacher
 
 app.post('/activityenroll', jsonParser, (req, res) => {
-    let activityID = req.body.activityID
-    let studentID = req.body.studentID
-    connection.query(
-        'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
-        [activityID, studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.json({status: 'ok', message: 'activity enroll successfully'})
-        }
-    )
+  let activityID = req.body.activityID
+  let studentID = req.body.studentID
+  connection.query(
+    'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
+    [activityID, studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.json({ status: 'ok', message: 'activity enroll successfully' })
+    }
+  )
 }) //done
 
 app.get('/whoenroll/:activityID', (req, res) => {
-    let activityID = req.params.activityID
-    connection.query(
-        'SELECT activityID, studentID, student.fname, student.lname, faculty.name AS faculty, status FROM activity_status JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE activityID = ?;',
-        [activityID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.length == 0) { res.json({status: 'ok', message: 'no one enroll'}); return }
-            res.send(results)
-        }
-    )
+  let activityID = req.params.activityID
+  connection.query(
+    'SELECT activityID, studentID, student.fname, student.lname, faculty.name AS faculty, status FROM activity_status JOIN student ON studentID = student.id JOIN faculty ON faculty.id = student.faculty WHERE activityID = ?;',
+    [activityID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.length == 0) {
+        res.json({ status: 'ok', message: 'no one enroll' })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) //done
 
 app.post('/creatactivity', jsonParser, (req, res) => {
-    let activityID = req.body.activityID
-    let studentID = req.body.studentID
-    connection.query(
-        'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
-        [activityID, studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.json({status: 'ok', message: 'activity enroll successfully'})
-        }
-    )
+  let activityID = req.body.activityID
+  let studentID = req.body.studentID
+  connection.query(
+    'INSERT INTO activity_status (activityID, studentID, status, timeEnroll, timeJoin) VALUES (?, ?, 0, current_timestamp(), NULL);',
+    [activityID, studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.json({ status: 'ok', message: 'activity enroll successfully' })
+    }
+  )
 }) //processing
 
 app.post('/activitycreate', jsonParser, (req, res) => {
-    let creator = req.body.creator
-    let name = req.body.name
-    let detail = req.body.detail
-    let location = req.body.location
-    let eventDate = req.body.eventDate
-    let timeStart = req.body.timeStart
-    let timeEnd = req.body.timeEnd
-    let hoursToReceive = req.body.hoursToReceive
-    let image = req.body.image
-    let year = req.body.year
-    let semester = req.body.semester
-    let max = req.body.max
-    connection.query(
-        'INSERT INTO activity (creator, name, detail, createdAt, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max) VALUES (?, ?, ?, current_timestamp(), ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-        [creator, name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.json({status: 'ok', message: 'activity enroll successfully'})
-        }
-    )
+  let creator = req.body.creator
+  let name = req.body.name
+  let detail = req.body.detail
+  let location = req.body.location
+  let eventDate = req.body.eventDate
+  let timeStart = req.body.timeStart
+  let timeEnd = req.body.timeEnd
+  let hoursToReceive = req.body.hoursToReceive
+  let image = req.body.image
+  let year = req.body.year
+  let semester = req.body.semester
+  let max = req.body.max
+  connection.query(
+    'INSERT INTO activity (creator, name, detail, createdAt, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max) VALUES (?, ?, ?, current_timestamp(), ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+    [creator, name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, year, semester, max],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.json({ status: 'ok', message: 'activity enroll successfully' })
+    }
+  )
 }) //done create teacher
 
 app.get('/countenroll/:activityID', (req, res) => {
-    let activityID = req.params.activityID
-    connection.query(
-        'SELECT COUNT(*) FROM activity_status WHERE activityID = ?;',
-        [activityID],
-        function(err, results, fields) {
-            res.send(results)
-        }
-    )
+  let activityID = req.params.activityID
+  connection.query('SELECT COUNT(*) FROM activity_status WHERE activityID = ?;', [activityID], function (err, results, fields) {
+    res.send(results)
+  })
 }) //count enroll per activity
 
 app.put('/setactivitystatustrue', jsonParser, (req, res) => {
-    let activityID = req.body.activityID
-    let studentID = req.body.studentID
-    connection.query(
-        'UPDATE activity_status SET status = 1, timeJoin = current_timestamp() WHERE activityID = ? AND studentID = ?;',
-        [activityID, studentID],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.affectedRows === 0) { res.json({status: 'error', message: 'affected Rows is 0'}); return }
-            res.json({status: 'ok', message: 'update activity true complete'})
-        }
-    )
+  let activityID = req.body.activityID
+  let studentID = req.body.studentID
+  connection.query(
+    'UPDATE activity_status SET status = 1, timeJoin = current_timestamp() WHERE activityID = ? AND studentID = ?;',
+    [activityID, studentID],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.affectedRows === 0) {
+        res.json({ status: 'error', message: 'affected Rows is 0' })
+        return
+      }
+      res.json({ status: 'ok', message: 'update activity true complete' })
+    }
+  )
 }) // set activity_status = 1
 
 app.post('/adminlogin', jsonParser, (req, res) => {
-    let user = req.body.user
-    let pass = req.body.pass
-    connection.query(
-        'SELECT * FROM admin WHERE user = ? AND pass = ?;',
-        [user, pass],
-        function(err, result, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(result.length == 0) { res.json({status: 'error', message: 'login failed', result}); return }
-            let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
-            res.json({status: 'ok', message: 'login successfully', result, token})
-        }
-    )
+  let user = req.body.user
+  let pass = req.body.pass
+  connection.query('SELECT * FROM admin WHERE user = ? AND pass = ?;', [user, pass], function (err, result, fields) {
+    if (err) {
+      res.json({ status: 'error', message: err })
+      return
+    }
+    if (result.length == 0) {
+      res.json({ status: 'error', message: 'login failed', result })
+      return
+    }
+    let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
+    res.json({ status: 'ok', message: 'login successfully', result, token })
+  })
 }) //done admin login
 
 app.post('/authen', jsonParser, (req, res) => {
-    try {
-        const token = req.headers.authorization.split(' ')[1]
-        let decoded = jwt.verify(token, secret)
-        res.json({status: 'ok', decoded})
-    } catch(err) {
-        res.json({status: 'error', message: err.message})
-    }
+  try {
+    const token = req.headers.authorization.split(' ')[1]
+    let decoded = jwt.verify(token, secret)
+    res.json({ status: 'ok', decoded })
+  } catch (err) {
+    res.json({ status: 'error', message: err.message })
+  }
 }) //done jwt authen
 
 app.put('/editactivity', jsonParser, (req, res) => {
-    let name = req.body.name
-    let detail = req.body.detail
-    let location = req.body.location
-    let eventDate = req.body.eventDate
-    let timeStart = req.body.timeStart
-    let timeEnd = req.body.timeEnd
-    let hoursToReceive = req.body.hoursToReceive
-    let image = req.body.image
-    let max = req.body.max
-    let id = req.body.id
-    connection.query(
-        'UPDATE activity SET name = ?, detail = ?, location = ?, eventDate = ?, timeStart = ?, timeEnd = ?, hoursToReceive = ?, image = ?, max = ? WHERE activity.id = ?;',
-        [name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, max, id],
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            if(results.affectedRows === 0) { res.json({status: 'error', message: 'affected Rows is 0'}); return }
-            res.json({status: 'ok', message: 'update activity complete'})
-        }
-    )
-}) // 
+  let name = req.body.name
+  let detail = req.body.detail
+  let location = req.body.location
+  let eventDate = req.body.eventDate
+  let timeStart = req.body.timeStart
+  let timeEnd = req.body.timeEnd
+  let hoursToReceive = req.body.hoursToReceive
+  let image = req.body.image
+  let max = req.body.max
+  let id = req.body.id
+  connection.query(
+    'UPDATE activity SET name = ?, detail = ?, location = ?, eventDate = ?, timeStart = ?, timeEnd = ?, hoursToReceive = ?, image = ?, max = ? WHERE activity.id = ?;',
+    [name, detail, location, eventDate, timeStart, timeEnd, hoursToReceive, image, max, id],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      if (results.affectedRows === 0) {
+        res.json({ status: 'error', message: 'affected Rows is 0' })
+        return
+      }
+      res.json({ status: 'ok', message: 'update activity complete' })
+    }
+  )
+}) //
 
 app.get('/teachers', (req, res) => {
-    connection.query(
-        'SELECT teacher.id,teacher.fname,teacher.lname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity WHERE creator = teacher.id) AS countactivity FROM `teacher` JOIN faculty ON faculty.id = teacher.faculty;',
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.send(results)
-        }
-    )
+  connection.query(
+    'SELECT teacher.id,teacher.fname,teacher.lname,faculty.name AS faculty, (SELECT COUNT(*) FROM activity WHERE creator = teacher.id) AS countactivity FROM `teacher` JOIN faculty ON faculty.id = teacher.faculty;',
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) // teacher list
 
 app.get('/students', (req, res) => {
-    connection.query(
-        'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id AND activity_status.status = 1)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty;',
-        function(err, results, fields) {
-            if(err) { res.json({status: 'error', message: err}); return }
-            res.send(results)
-        }
-    )
+  connection.query(
+    'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id AND activity_status.status = 1)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty;',
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err })
+        return
+      }
+      res.send(results)
+    }
+  )
 }) // student list
 
 app.get('/studenthour/:studentID', (req, res) => {
-    let studentID = req.params.studentID
-    connection.query(
-        'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id AND activity_status.status = 1)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ?;',
-        [studentID],
-        function(err, results, fields) {
-            res.send(results)
-        }
-    )
+  let studentID = req.params.studentID
+  connection.query(
+    'SELECT student.id,student.fname,student.lname,faculty.name AS faculty, (SELECT SUM(activity.hoursToReceive) FROM activity WHERE activity.id IN(SELECT activity_status.activityID FROM activity_status WHERE activity_status.studentID = student.id AND activity_status.status = 1)) AS sumhours FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ?;',
+    [studentID],
+    function (err, results, fields) {
+      res.send(results)
+    }
+  )
 }) // a student and hours
 
 app.get('/datas', (req, res) => {
-    connection.query(
-        'SELECT * FROM faculty',
-        function(err, results, fields) {
-            res.send(results)
-        }
-    )
+  connection.query('SELECT * FROM faculty', function (err, results, fields) {
+    res.send(results)
+  })
 })
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
 
-
-
 //UPDATE student_connect SET `lineID` = "ty" WHERE studentID = 6300196;
 //SELECT activity.id,activity.creator,activity.name,activity.detail,activity.createdAt,activity.location,activity.eventDate,activity.timeStart,activity.timeEnd,activity.hoursToReceive,activity.image,activity.year,activity.semester,activity.max,teacher.fname AS teacherfname,teacher.lname AS teacherlname,faculty.name AS faculty,activity_status.studentID AS studentID
-//FROM `activity` 
-//JOIN teacher ON creator = teacher.id 
+//FROM `activity`
+//JOIN teacher ON creator = teacher.id
 //JOIN faculty ON faculty.id = teacher.faculty
 //JOIN activity_status ON activity.id = activity_status.activityID
 //WHERE activity_status.studentID = 6300195
