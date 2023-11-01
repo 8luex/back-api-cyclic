@@ -562,7 +562,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
   const accessToken =
     'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
   const userId = 'U9325b70184a81caf5d81ac60128b4304'
-  const message = {
+  const message = JSON.stringify({
     to: userId,
     messages: [
       {
@@ -671,7 +671,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
         },
       },
     ],
-  }
+  })
   axios
     .post(lineAPIEndpoint, message, {
       headers: {
