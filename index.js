@@ -556,6 +556,7 @@ app.get('/datas', (req, res) => {
 })
 
 app.post('/linecompleted', jsonParser, (req, res) => {
+  let dialog = req.body.dialog
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
   const accessToken =
     'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
@@ -604,7 +605,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                     contents: [
                       {
                         type: 'text',
-                        text: 'this.dialog.name',
+                        text: 'dialog.name',
                         size: 'sm',
                         color: '#666666',
                         flex: 5,
@@ -630,7 +631,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                       },
                       {
                         type: 'text',
-                        text: 'this.dialog.hoursToReceive',
+                        text: 'dialog.hoursToReceive',
                         size: 'sm',
                         color: '#666666',
                         flex: 4,
