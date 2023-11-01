@@ -10,12 +10,7 @@ const axios = require('axios')
 const jwt = require('jsonwebtoken')
 const secret = 'linebluezo'
 
-const corsOptions = {
-  origin: 'https://api.line.me/v2/bot/message/push',
-  credentials: true,
-}
-
-app.use(cors(corsOptions))
+app.use(cors())
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
 
