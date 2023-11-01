@@ -556,13 +556,13 @@ app.get('/datas', (req, res) => {
 })
 
 app.post('/linecompleted', jsonParser, (req, res) => {
-  let dialog = req.body.dialog
-  const { name, hoursToReceive } = dialog
+  let name = req.body.name
+  let hoursToReceive = req.body.hoursToReceive
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
   const accessToken =
     'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
   const userId = 'U9325b70184a81caf5d81ac60128b4304'
-  const message = JSON.stringify({
+  const message = {
     to: userId,
     messages: [
       {
@@ -671,7 +671,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
         },
       },
     ],
-  })
+  }
   axios
     .post(lineAPIEndpoint, message, {
       headers: {
