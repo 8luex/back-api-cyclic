@@ -5,16 +5,17 @@ require('dotenv').config()
 const app = express()
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
+const axios = require('axios')
 
 const jwt = require('jsonwebtoken')
 const secret = 'linebluezo'
 
-const corsOptions = {
-  origin: 'https://api.line.me/v2/bot/message/push',
-  credentials: true,
-}
+// const corsOptions = {
+//   origin: 'https://api.line.me/v2/bot/message/push',
+//   credentials: true,
+// }
 
-app.use(cors(corsOptions))
+app.use(cors())
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
 
@@ -555,9 +556,12 @@ app.get('/datas', (req, res) => {
 })
 
 app.post('/linecompleted', jsonParser, (req, res) => {
-  let lineID = req.body.lineID
-  const dataString = JSON.stringify({
-    to: 'U9325b70184a81caf5d81ac60128b4304',
+  const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
+  const accessToken =
+    'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
+  const userId = 'U9325b70184a81caf5d81ac60128b4304'
+  const message = {
+    to: userId,
     messages: [
       {
         type: 'flex',
@@ -665,29 +669,20 @@ app.post('/linecompleted', jsonParser, (req, res) => {
         },
       },
     ],
-  })
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization:
-      'Bearer n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU=',
   }
-
-  const webhookOptions = {
-    hostname: 'api.line.me',
-    path: '/v2/bot/message/push',
-    method: 'POST',
-    headers: headers,
-  }
-
-  const request = https.request(webhookOptions)
-  request.on('error', (err) => {
-    res.json({ status: 'error', message: err })
-  })
-
-  request.write(dataString)
-  res.json({ status: 'ok', message: 'sent complete' })
-  request.end()
+  axios
+    .post(lineAPIEndpoint, message, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then((response) => {
+      res.json({ status: 'ok', message: 'sent complete' })
+    })
+    .catch((error) => {
+      res.json({ status: 'error', message: error })
+    })
 }) // line completed
 
 app.listen(process.env.PORT || 3000)
