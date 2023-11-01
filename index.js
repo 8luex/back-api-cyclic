@@ -605,7 +605,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                     contents: [
                       {
                         type: 'text',
-                        text: 'dialog.name',
+                        text: dialog.name,
                         size: 'sm',
                         color: '#666666',
                         flex: 5,
@@ -631,7 +631,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                       },
                       {
                         type: 'text',
-                        text: 'dialog.hoursToReceive',
+                        text: dialog.hoursToReceive,
                         size: 'sm',
                         color: '#666666',
                         flex: 4,
