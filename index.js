@@ -679,7 +679,8 @@ app.post('/linecompleted', jsonParser, (req, res) => {
       },
     })
     .then((response) => {
-      res.json({ status: 'ok', message: 'sent complete' })
+      // res.json({ status: 'ok', message: 'sent complete' })
+      res.send(dialog)
     })
     .catch((error) => {
       res.json({ status: 'error', message: error })
