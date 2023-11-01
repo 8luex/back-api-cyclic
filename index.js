@@ -9,7 +9,12 @@ const jsonParser = bodyParser.json()
 const jwt = require('jsonwebtoken')
 const secret = 'linebluezo'
 
-app.use(cors())
+const corsOptions = {
+  origin: 'https://api.line.me/v2/bot/message/push',
+  credentials: true,
+}
+
+app.use(cors(corsOptions))
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
 
@@ -548,6 +553,138 @@ app.get('/datas', (req, res) => {
     res.send(results)
   })
 })
+
+app.post('/linecompleted', jsonParser, (req, res) => {
+  // let lineID = req.body.lineID
+  const dataString = JSON.stringify({
+    to: 'U9325b70184a81caf5d81ac60128b4304',
+    messages: [
+      {
+        type: 'bubble',
+        hero: {
+          type: 'image',
+          url: 'https://i.ytimg.com/vi/aIk2AWuZWiE/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLATvc9XPfL2gtJ9CVmYRjMR0qeiUQ',
+          size: 'full',
+          aspectRatio: '20:13',
+          aspectMode: 'cover',
+          action: {
+            type: 'uri',
+            label: 'Line',
+            uri: 'https://linecorp.com/',
+          },
+        },
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: 'ยืนยันการทำกิจกรรม',
+              weight: 'bold',
+              size: 'lg',
+              contents: [],
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
+              margin: 'lg',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: 'this.dialog.name',
+                      size: 'sm',
+                      color: '#666666',
+                      flex: 5,
+                      wrap: true,
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  backgroundColor: '#FFFFFFFF',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: 'ชั่วโมงที่ได้รับ',
+                      size: 'sm',
+                      color: '#AAAAAA',
+                      flex: 2,
+                      wrap: true,
+                      contents: [],
+                    },
+                    {
+                      type: 'text',
+                      text: 'this.dialog.hoursToReceive',
+                      size: 'sm',
+                      color: '#666666',
+                      flex: 4,
+                      wrap: true,
+                      contents: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          flex: 0,
+          spacing: 'sm',
+          contents: [
+            {
+              type: 'button',
+              action: {
+                type: 'uri',
+                label: 'ดูกิจกรรมที่ทำ',
+                uri: 'https://liff.line.me/1657670230-K8J8zq7n',
+              },
+              color: '#1DE9B6FF',
+              height: 'sm',
+              style: 'primary',
+            },
+            {
+              type: 'spacer',
+              size: 'sm',
+            },
+          ],
+        },
+      },
+    ],
+  })
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization:
+      'Bearer n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU=',
+  }
+
+  const webhookOptions = {
+    hostname: 'api.line.me',
+    path: '/v2/bot/message/push',
+    method: 'POST',
+    headers: headers,
+  }
+
+  const request = https.request(webhookOptions)
+  request.on('error', (err) => {
+    res.json({ status: 'error', message: err })
+  })
+
+  request.write(dataString)
+  res.json({ status: 'ok', message: 'sent complete' })
+  request.end()
+}) // line completed
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
