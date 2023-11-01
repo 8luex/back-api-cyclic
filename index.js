@@ -601,7 +601,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                     contents: [
                       {
                         type: 'text',
-                        text: name,
+                        text: name+'',
                         size: 'sm',
                         color: '#666666',
                         flex: 5,
@@ -627,7 +627,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
                       },
                       {
                         type: 'text',
-                        text: hoursToReceive,
+                        text: hoursToReceive+' ชั่วโมง',
                         size: 'sm',
                         color: '#666666',
                         flex: 4,
