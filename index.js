@@ -550,13 +550,13 @@ app.get('/datas', (req, res) => {
   })
 })
 
-app.post('/linecompleted', jsonParser, (req, res) => {
+app.post('/linecompleted', jsonParser, async (req, res) => {
   let studentID = req.body.studentID
   let name = req.body.name
   let hoursToReceive = req.body.hoursToReceive
   let userId = ''
 
-  connection.query(
+  await connection.query(
     'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname WHERE studentID=?;',
     [studentID],
     function (err, results, fields) {
@@ -677,7 +677,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
       },
     ],
   }
-  axios
+  await axios
     .post(lineAPIEndpoint, message, {
       headers: {
         'Content-Type': 'application/json',
