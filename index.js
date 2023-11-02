@@ -677,16 +677,13 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
         },
       ],
     }
-    await axios
-      .post(lineAPIEndpoint, message, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((response) => {
-        res.json({ status: 'ok', message: 'sent complete' })
-      })
+    await axios.post(lineAPIEndpoint, message, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    res.json({ status: 'ok', message: 'sent complete' })
   } catch (error) {
     res.json({ status: 'error', message: error })
   }
