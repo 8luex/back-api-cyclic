@@ -685,7 +685,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
         Authorization: `Bearer ${accessToken}`,
       },
     })
-    .then(() => {
+    .then((response) => {
       res.json({ status: 'ok', message: 'sent complete' })
     })
     .catch((error) => {
