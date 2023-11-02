@@ -563,6 +563,7 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
       function (err, results, fields) {
         console.log(results)
         userId = results[0].lineID
+        console.log(userId);
       }
     )
 
