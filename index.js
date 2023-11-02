@@ -688,6 +688,7 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
     })
     res.json({ status: 'ok', message: 'sent complete' })
   } catch (error) {
+    console.log(error);
     res.json({ status: 'error', message: error })
   }
 
