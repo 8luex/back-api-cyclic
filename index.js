@@ -1,7 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const mysql = require('mysql2')
-const mysqlpromise = require('mysql2/promise');
 require('dotenv').config()
 const app = express()
 const bodyParser = require('body-parser')
@@ -14,7 +13,6 @@ const secret = 'linebluezo'
 app.use(cors())
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
-const connectionpromise = mysqlpromise.createConnection(process.env.DATABASE_URL)
 
 app.get('/', (req, res) => {
   console.log('Hello world')
@@ -552,159 +550,154 @@ app.get('/datas', (req, res) => {
   })
 })
 
-app.post('/linecompleted', jsonParser, async (req, res) => {
+app.post('/linecompleted', jsonParser, (req, res) => {
   let studentID = req.body.studentID
   let name = req.body.name
   let hoursToReceive = req.body.hoursToReceive
   let userId = ''
 
-  try {
-    // await connection.execute(
-    //   'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
-    //   [studentID],
-    //   function (err, results, fields) {
-    //     console.log('Blue', results)
-    //     userId = results[0].lineID
-    //     console.log(userId)
-    //   }
-    // )
-    const [results, fields] = await connectionpromise.execute('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID])
-
-    if (results.length > 0) {
+  connection
+    .execute('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID])
+    .then(([results, fields]) => {
+      console.log('Blue', results)
       userId = results[0].lineID
-    } else {
-      console.log('No user found')
-    }
+      console.log(userId)
 
-    const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
-    const accessToken =
-      'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
-    const message = {
-      to: userId + '',
-      messages: [
-        {
-          type: 'flex',
-          altText: 'ยืนยันการทำกิจกรรม',
-          contents: {
-            type: 'bubble',
-            hero: {
-              type: 'image',
-              url: 'https://i.ytimg.com/vi/aIk2AWuZWiE/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLATvc9XPfL2gtJ9CVmYRjMR0qeiUQ',
-              size: 'full',
-              aspectRatio: '20:13',
-              aspectMode: 'cover',
-              action: {
-                type: 'uri',
-                label: 'Line',
-                uri: 'https://linecorp.com/',
+      const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
+      const accessToken =
+        'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
+
+      const message = {
+        to: userId + '',
+        messages: [
+          {
+            type: 'flex',
+            altText: 'ยืนยันการทำกิจกรรม',
+            contents: {
+              type: 'bubble',
+              hero: {
+                type: 'image',
+                url: 'https://i.ytimg.com/vi/aIk2AWuZWiE/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLATvc9XPfL2gtJ9CVmYRjMR0qeiUQ',
+                size: 'full',
+                aspectRatio: '20:13',
+                aspectMode: 'cover',
+                action: {
+                  type: 'uri',
+                  label: 'Line',
+                  uri: 'https://linecorp.com/',
+                },
+              },
+              body: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ยืนยันการทำกิจกรรม',
+                    weight: 'bold',
+                    size: 'lg',
+                    contents: [],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'vertical',
+                    spacing: 'sm',
+                    margin: 'lg',
+                    contents: [
+                      {
+                        type: 'box',
+                        layout: 'baseline',
+                        spacing: 'sm',
+                        contents: [
+                          {
+                            type: 'text',
+                            text: name + '',
+                            size: 'sm',
+                            color: '#666666',
+                            flex: 5,
+                            wrap: true,
+                            contents: [],
+                          },
+                        ],
+                      },
+                      {
+                        type: 'box',
+                        layout: 'baseline',
+                        spacing: 'sm',
+                        backgroundColor: '#FFFFFFFF',
+                        contents: [
+                          {
+                            type: 'text',
+                            text: 'ชั่วโมงที่ได้รับ',
+                            size: 'sm',
+                            color: '#AAAAAA',
+                            flex: 2,
+                            wrap: true,
+                            contents: [],
+                          },
+                          {
+                            type: 'text',
+                            text: hoursToReceive + ' ชั่วโมง',
+                            size: 'sm',
+                            color: '#666666',
+                            flex: 4,
+                            wrap: true,
+                            contents: [],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              footer: {
+                type: 'box',
+                layout: 'vertical',
+                flex: 0,
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'button',
+                    action: {
+                      type: 'uri',
+                      label: 'ดูกิจกรรมที่ทำ',
+                      uri: 'https://liff.line.me/1657670230-K8J8zq7n',
+                    },
+                    color: '#1DE9B6FF',
+                    height: 'sm',
+                    style: 'primary',
+                  },
+                  {
+                    type: 'spacer',
+                    size: 'sm',
+                  },
+                ],
               },
             },
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: 'ยืนยันการทำกิจกรรม',
-                  weight: 'bold',
-                  size: 'lg',
-                  contents: [],
-                },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  spacing: 'sm',
-                  margin: 'lg',
-                  contents: [
-                    {
-                      type: 'box',
-                      layout: 'baseline',
-                      spacing: 'sm',
-                      contents: [
-                        {
-                          type: 'text',
-                          text: name + '',
-                          size: 'sm',
-                          color: '#666666',
-                          flex: 5,
-                          wrap: true,
-                          contents: [],
-                        },
-                      ],
-                    },
-                    {
-                      type: 'box',
-                      layout: 'baseline',
-                      spacing: 'sm',
-                      backgroundColor: '#FFFFFFFF',
-                      contents: [
-                        {
-                          type: 'text',
-                          text: 'ชั่วโมงที่ได้รับ',
-                          size: 'sm',
-                          color: '#AAAAAA',
-                          flex: 2,
-                          wrap: true,
-                          contents: [],
-                        },
-                        {
-                          type: 'text',
-                          text: hoursToReceive + ' ชั่วโมง',
-                          size: 'sm',
-                          color: '#666666',
-                          flex: 4,
-                          wrap: true,
-                          contents: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-            footer: {
-              type: 'box',
-              layout: 'vertical',
-              flex: 0,
-              spacing: 'sm',
-              contents: [
-                {
-                  type: 'button',
-                  action: {
-                    type: 'uri',
-                    label: 'ดูกิจกรรมที่ทำ',
-                    uri: 'https://liff.line.me/1657670230-K8J8zq7n',
-                  },
-                  color: '#1DE9B6FF',
-                  height: 'sm',
-                  style: 'primary',
-                },
-                {
-                  type: 'spacer',
-                  size: 'sm',
-                },
-              ],
-            },
           },
-        },
-      ],
-    }
-    await axios.post(lineAPIEndpoint, message, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-    res.json({ status: 'ok', message: 'sent complete' })
-  } catch (error) {
-    console.log(error)
-    res.json({ status: 'error', message: error })
-  }
+        ],
+      }
 
-  // .catch((error) => {
-  //   res.json({ status: 'error', message: error })
-  // })
-}) // line completed
+      axios
+        .post(lineAPIEndpoint, message, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then(() => {
+          res.json({ status: 'ok', message: 'sent complete' })
+        })
+        .catch((error) => {
+          console.error(error)
+          res.json({ status: 'error', message: error })
+        })
+    })
+    .catch((error) => {
+      console.log(error)
+      res.json({ status: 'error', message: error })
+    })
+})
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
