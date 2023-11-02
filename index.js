@@ -562,10 +562,6 @@ app.post('/linecompleted', jsonParser, (req, res) => {
   let hoursToReceive = req.body.hoursToReceive
   let userId = req.body.userId
 
-  console.log('Blue', results)
-  userId = results[0].lineID
-  console.log(userId)
-
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
   const accessToken =
     'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
