@@ -561,9 +561,9 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
       'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
       [studentID],
       function (err, results, fields) {
-        console.log(results)
+        console.log('Blue', results)
         userId = results[0].lineID
-        console.log(userId);
+        console.log(userId)
       }
     )
 
