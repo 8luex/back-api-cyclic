@@ -557,15 +557,22 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
   let userId = ''
 
   try {
-    await connection.execute(
-      'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
-      [studentID],
-      function (err, results, fields) {
-        console.log('Blue', results)
-        userId = results[0].lineID
-        console.log(userId)
-      }
-    )
+    // await connection.execute(
+    //   'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
+    //   [studentID],
+    //   function (err, results, fields) {
+    //     console.log('Blue', results)
+    //     userId = results[0].lineID
+    //     console.log(userId)
+    //   }
+    // )
+    const [results, fields] = await connection.execute('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID])
+
+    if (results.length > 0) {
+      userId = results[0].lineID
+    } else {
+      console.log('No user found')
+    }
 
     const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
     const accessToken =
