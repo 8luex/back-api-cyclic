@@ -558,7 +558,7 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
 
   try {
     const results = await connection.execute(
-      'SELECT student_connect.lineID, student_connect.studentID WHERE studentID=?;',
+      'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
       [studentID]
     )
 
