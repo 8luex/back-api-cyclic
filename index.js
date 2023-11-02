@@ -557,13 +557,14 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
   let userId = ''
 
   try {
-    const results = await connection.execute(
+    await connection.execute(
       'SELECT lineID, studentID FROM student_connect WHERE studentID=?;',
-      [studentID]
+      [studentID],
+      function (err, results, fields) {
+        console.log(results)
+        userId = results[0].lineID
+      }
     )
-    console.log(results);
-
-    userId = results[0].lineID
 
     const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
     const accessToken =
