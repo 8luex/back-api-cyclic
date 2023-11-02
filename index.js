@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const mysql = require('mysql2')
+const mysqlpromise = require('mysql2/promise');
 require('dotenv').config()
 const app = express()
 const bodyParser = require('body-parser')
@@ -13,6 +14,7 @@ const secret = 'linebluezo'
 app.use(cors())
 
 const connection = mysql.createConnection(process.env.DATABASE_URL)
+const connectionpromise = mysqlpromise.createConnection(process.env.DATABASE_URL)
 
 app.get('/', (req, res) => {
   console.log('Hello world')
@@ -566,7 +568,7 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
     //     console.log(userId)
     //   }
     // )
-    const [results, fields] = await connection.execute('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID])
+    const [results, fields] = await connectionpromise.execute('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID])
 
     if (results.length > 0) {
       userId = results[0].lineID
