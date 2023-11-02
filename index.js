@@ -551,12 +551,22 @@ app.get('/datas', (req, res) => {
 })
 
 app.post('/linecompleted', jsonParser, (req, res) => {
+  let studentID = req.body.studentID
   let name = req.body.name
   let hoursToReceive = req.body.hoursToReceive
+  let userId = ''
+
+  connection.query(
+    'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname WHERE studentID=?;',
+    [studentID],
+    function (err, results, fields) {
+      userId = results[0].lineID
+    }
+  )
+
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
   const accessToken =
     'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
-  const userId = 'U9325b70184a81caf5d81ac60128b4304'
   const message = {
     to: userId,
     messages: [
