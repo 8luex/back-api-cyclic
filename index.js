@@ -554,6 +554,7 @@ app.get('/getlineid/:studentID', jsonParser, (req, res) => {
   let studentID = req.body.studentID
   connection.query('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID], function (err, results, fields) {
     res.send(results)
+    console.log(results);
   })
 }) //done getlineid
 
