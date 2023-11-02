@@ -556,140 +556,144 @@ app.post('/linecompleted', jsonParser, async (req, res) => {
   let hoursToReceive = req.body.hoursToReceive
   let userId = ''
 
-  await connection.query(
-    'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname WHERE studentID=?;',
-    [studentID],
-    function (err, results, fields) {
-      userId = results[0].lineID
-    }
-  )
+  try {
+    const results = await connection.query(
+      'SELECT student_connect.lineID, student_connect.studentID, student.fname, student.lname WHERE studentID=?;',
+      [studentID]
+    )
 
-  const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
-  const accessToken =
-    'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
-  const message = {
-    to: userId,
-    messages: [
-      {
-        type: 'flex',
-        altText: 'ยืนยันการทำกิจกรรม',
-        contents: {
-          type: 'bubble',
-          hero: {
-            type: 'image',
-            url: 'https://i.ytimg.com/vi/aIk2AWuZWiE/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLATvc9XPfL2gtJ9CVmYRjMR0qeiUQ',
-            size: 'full',
-            aspectRatio: '20:13',
-            aspectMode: 'cover',
-            action: {
-              type: 'uri',
-              label: 'Line',
-              uri: 'https://linecorp.com/',
+    userId = results[0].lineID
+
+    const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
+    const accessToken =
+      'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
+    const message = {
+      to: userId,
+      messages: [
+        {
+          type: 'flex',
+          altText: 'ยืนยันการทำกิจกรรม',
+          contents: {
+            type: 'bubble',
+            hero: {
+              type: 'image',
+              url: 'https://i.ytimg.com/vi/aIk2AWuZWiE/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLATvc9XPfL2gtJ9CVmYRjMR0qeiUQ',
+              size: 'full',
+              aspectRatio: '20:13',
+              aspectMode: 'cover',
+              action: {
+                type: 'uri',
+                label: 'Line',
+                uri: 'https://linecorp.com/',
+              },
+            },
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: 'ยืนยันการทำกิจกรรม',
+                  weight: 'bold',
+                  size: 'lg',
+                  contents: [],
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  spacing: 'sm',
+                  margin: 'lg',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'baseline',
+                      spacing: 'sm',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: name + '',
+                          size: 'sm',
+                          color: '#666666',
+                          flex: 5,
+                          wrap: true,
+                          contents: [],
+                        },
+                      ],
+                    },
+                    {
+                      type: 'box',
+                      layout: 'baseline',
+                      spacing: 'sm',
+                      backgroundColor: '#FFFFFFFF',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: 'ชั่วโมงที่ได้รับ',
+                          size: 'sm',
+                          color: '#AAAAAA',
+                          flex: 2,
+                          wrap: true,
+                          contents: [],
+                        },
+                        {
+                          type: 'text',
+                          text: hoursToReceive + ' ชั่วโมง',
+                          size: 'sm',
+                          color: '#666666',
+                          flex: 4,
+                          wrap: true,
+                          contents: [],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              flex: 0,
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'button',
+                  action: {
+                    type: 'uri',
+                    label: 'ดูกิจกรรมที่ทำ',
+                    uri: 'https://liff.line.me/1657670230-K8J8zq7n',
+                  },
+                  color: '#1DE9B6FF',
+                  height: 'sm',
+                  style: 'primary',
+                },
+                {
+                  type: 'spacer',
+                  size: 'sm',
+                },
+              ],
             },
           },
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              {
-                type: 'text',
-                text: 'ยืนยันการทำกิจกรรม',
-                weight: 'bold',
-                size: 'lg',
-                contents: [],
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                spacing: 'sm',
-                margin: 'lg',
-                contents: [
-                  {
-                    type: 'box',
-                    layout: 'baseline',
-                    spacing: 'sm',
-                    contents: [
-                      {
-                        type: 'text',
-                        text: name+'',
-                        size: 'sm',
-                        color: '#666666',
-                        flex: 5,
-                        wrap: true,
-                        contents: [],
-                      },
-                    ],
-                  },
-                  {
-                    type: 'box',
-                    layout: 'baseline',
-                    spacing: 'sm',
-                    backgroundColor: '#FFFFFFFF',
-                    contents: [
-                      {
-                        type: 'text',
-                        text: 'ชั่วโมงที่ได้รับ',
-                        size: 'sm',
-                        color: '#AAAAAA',
-                        flex: 2,
-                        wrap: true,
-                        contents: [],
-                      },
-                      {
-                        type: 'text',
-                        text: hoursToReceive+' ชั่วโมง',
-                        size: 'sm',
-                        color: '#666666',
-                        flex: 4,
-                        wrap: true,
-                        contents: [],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-          footer: {
-            type: 'box',
-            layout: 'vertical',
-            flex: 0,
-            spacing: 'sm',
-            contents: [
-              {
-                type: 'button',
-                action: {
-                  type: 'uri',
-                  label: 'ดูกิจกรรมที่ทำ',
-                  uri: 'https://liff.line.me/1657670230-K8J8zq7n',
-                },
-                color: '#1DE9B6FF',
-                height: 'sm',
-                style: 'primary',
-              },
-              {
-                type: 'spacer',
-                size: 'sm',
-              },
-            ],
-          },
         },
-      },
-    ],
+      ],
+    }
+    await axios
+      .post(lineAPIEndpoint, message, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((response) => {
+        res.json({ status: 'ok', message: 'sent complete' })
+      })
+  } catch (error) {
+    res.json({ status: 'error', message: error })
   }
-  await axios
-    .post(lineAPIEndpoint, message, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-    .then((response) => {
-      res.json({ status: 'ok', message: 'sent complete' })
-    })
-    .catch((error) => {
-      res.json({ status: 'error', message: error })
-    })
+
+  // .catch((error) => {
+  //   res.json({ status: 'error', message: error })
+  // })
 }) // line completed
 
 app.listen(process.env.PORT || 3000)
