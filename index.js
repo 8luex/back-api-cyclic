@@ -701,6 +701,7 @@ app.post('/lineenroll', jsonParser, (req, res) => {
   let timeStart = req.body.timeStart
   let timeEnd = req.body.timeEnd
   let location = req.body.location
+  let userId = req.body.userId
 
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
   const accessToken =
