@@ -554,7 +554,7 @@ app.get('/getlineid/:studentID', jsonParser, (req, res) => {
   let studentID = req.params.studentID
   connection.query('SELECT lineID, studentID FROM student_connect WHERE studentID=?;', [studentID], function (err, results, fields) {
     res.send(results)
-    console.log(results);
+    console.log(results)
   })
 }) //done getlineid
 
@@ -670,6 +670,187 @@ app.post('/linecompleted', jsonParser, (req, res) => {
               {
                 type: 'spacer',
                 size: 'sm',
+              },
+            ],
+          },
+        },
+      },
+    ],
+  }
+
+  axios
+    .post(lineAPIEndpoint, message, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then((response) => {
+      res.json({ status: 'ok', message: 'sent complete' })
+    })
+    .catch((error) => {
+      console.error(error)
+      res.json({ status: 'error', message: error })
+    })
+})
+
+app.post('/lineenroll', jsonParser, (req, res) => {
+  let name = req.body.name
+  let eventDate = req.body.eventDate
+  eventDate = eventDate.substring(0, 10)
+  let timeStart = req.body.timeStart
+  let timeEnd = req.body.timeEnd
+  let location = req.body.location
+
+  const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
+  const accessToken =
+    'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
+
+  const message = {
+    to: userId + '',
+    messages: [
+      {
+        type: 'flex',
+        altText: 'ยืนยันการทำกิจกรรม',
+        contents: {
+          type: 'bubble',
+          hero: {
+            type: 'image',
+            url: 'https://dotesports.com/wp-content/uploads/2023/02/13000033/Gawr-Gura-Returns-to-YouTube-Streaming.png?w=1200',
+            size: 'full',
+            aspectRatio: '20:13',
+            aspectMode: 'cover',
+            action: {
+              type: 'uri',
+              label: 'Line',
+              uri: 'https://linecorp.com/',
+            },
+          },
+          body: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              {
+                type: 'text',
+                text: 'ลงทะเบียนสำเร็จ',
+                weight: 'bold',
+                size: 'xl',
+                contents: [],
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                spacing: 'sm',
+                margin: 'lg',
+                contents: [
+                  {
+                    type: 'box',
+                    layout: 'baseline',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: name + '',
+                        size: 'sm',
+                        color: '#666666',
+                        flex: 5,
+                        wrap: true,
+                        contents: [],
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'baseline',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: 'Date',
+                        size: 'sm',
+                        color: '#AAAAAA',
+                        flex: 1,
+                        contents: [],
+                      },
+                      {
+                        type: 'text',
+                        text: eventDate + '',
+                        size: 'sm',
+                        color: '#666666',
+                        flex: 5,
+                        wrap: true,
+                        contents: [],
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'baseline',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: 'Time',
+                        size: 'sm',
+                        color: '#AAAAAA',
+                        flex: 1,
+                        contents: [],
+                      },
+                      {
+                        type: 'text',
+                        text: timeStart + ' - ' + timeEnd,
+                        size: 'sm',
+                        color: '#666666',
+                        flex: 5,
+                        wrap: true,
+                        contents: [],
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'baseline',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: 'Place',
+                        size: 'sm',
+                        color: '#AAAAAA',
+                        flex: 1,
+                        contents: [],
+                      },
+                      {
+                        type: 'text',
+                        text: location + '',
+                        size: 'sm',
+                        color: '#666666',
+                        flex: 5,
+                        wrap: true,
+                        contents: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          footer: {
+            type: 'box',
+            layout: 'vertical',
+            flex: 0,
+            spacing: 'sm',
+            contents: [
+              {
+                type: 'button',
+                action: {
+                  type: 'uri',
+                  label: 'กิจกรรมที่ลงทะเบียน',
+                  uri: 'https://linecorp.com',
+                },
+                color: '#1DE9B6FF',
+                height: 'sm',
+                style: 'primary',
               },
             ],
           },
