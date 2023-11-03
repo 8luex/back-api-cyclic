@@ -712,7 +712,7 @@ app.post('/lineenroll', jsonParser, (req, res) => {
     messages: [
       {
         type: 'flex',
-        altText: 'ยืนยันการทำกิจกรรม',
+        altText: 'ลงทะเบียนสำเร็จ',
         contents: {
           type: 'bubble',
           hero: {
@@ -735,7 +735,7 @@ app.post('/lineenroll', jsonParser, (req, res) => {
                 type: 'text',
                 text: 'ลงทะเบียนสำเร็จ',
                 weight: 'bold',
-                size: 'xl',
+                size: 'lg',
                 contents: [],
               },
               {
