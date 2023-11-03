@@ -847,7 +847,7 @@ app.post('/lineenroll', jsonParser, (req, res) => {
                 action: {
                   type: 'uri',
                   label: 'กิจกรรมที่ลงทะเบียน',
-                  uri: 'https://linecorp.com',
+                  uri: 'https://liff.line.me/1657670230-Mp0gNae5',
                 },
                 color: '#1DE9B6FF',
                 height: 'sm',
