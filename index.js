@@ -6,9 +6,17 @@ const app = express()
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 const axios = require('axios')
+const line = require('@line/bot-sdk');
 
 const jwt = require('jsonwebtoken')
 const secret = 'linebluezo'
+
+const config = {
+  channelAccessToken: "2TDhgW9gktEOWPWKcxj+1ir0vcYXezbDQAoI/xpPI+aOvY3CHmGHAwhAu6QoFs2B5eqWtmCaFxG8hFZfs6Upg21BHVPk7+jdNQKR8IngJYLcPhdV+ymxS1jpFt2FIWpnb231ZDo1gm3I9aPnacDqWAdB04t89/1O/w1cDnyilFU=",
+  channelSecret: "4da739fa6e17b8a7c7200d27acaa23b0",
+}
+
+const client = new line.Client(config);
 
 app.use(cors())
 
@@ -323,6 +331,7 @@ app.post('/login', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', student })
         return
       }
+      client.linkRichMenuToUser(lineID, "richmenu-7d6845b74c3ab4ee9930f9e626af79f3");
       res.json({ status: 'ok', message: 'connected successfully', student })
     }
   )
@@ -331,6 +340,7 @@ app.post('/login', jsonParser, (req, res) => {
 app.post('/teacherlogin', jsonParser, (req, res) => {
   let teacherID = req.body.teacherID
   let teacherPassword = req.body.teacherPassword
+  let lineID = req.body.lineID
   connection.query(
     'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
     [teacherID, teacherPassword],
@@ -343,6 +353,7 @@ app.post('/teacherlogin', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', teacher })
         return
       }
+      client.linkRichMenuToUser(lineID, "richmenu-dbc3db4798a5c797d2607651a74aa2ea");
       res.json({ status: 'ok', message: 'connected successfully', teacher })
     }
   )
@@ -564,8 +575,6 @@ app.post('/linecompleted', jsonParser, (req, res) => {
   let userId = req.body.userId
 
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
-  const accessToken =
-    'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
 
   const message = {
     to: userId + '',
@@ -682,7 +691,7 @@ app.post('/linecompleted', jsonParser, (req, res) => {
     .post(lineAPIEndpoint, message, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${config.channelAccessToken}`,
       },
     })
     .then((response) => {
@@ -704,8 +713,6 @@ app.post('/lineenroll', jsonParser, (req, res) => {
   let userId = req.body.userId
 
   const lineAPIEndpoint = 'https://api.line.me/v2/bot/message/push'
-  const accessToken =
-    'n9SrfCUXUZE68EKk/2u605XjDbRcttCOh80d2G07hT2aze7yvPw7HC9Vv6KUHruuj6JY+O2wKDzfCkyU4jM9mDG36AgcQXw3abqNrbLmo9WQnS69CoMWqLmOYrmKpUnAc2eu1YXMqTzc0nFwlk3eDwdB04t89/1O/w1cDnyilFU='
 
   const message = {
     to: userId + '',
@@ -864,7 +871,7 @@ app.post('/lineenroll', jsonParser, (req, res) => {
     .post(lineAPIEndpoint, message, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${config.channelAccessToken}`,
       },
     })
     .then((response) => {
@@ -875,6 +882,12 @@ app.post('/lineenroll', jsonParser, (req, res) => {
       res.json({ status: 'error', message: error })
     })
 })
+
+app.get('/unlink-richmenu/:lineID', jsonParser,(req, res) => {
+  let lineID = req.params.lineID
+  client.unlinkRichMenuFromUser(lineID);
+  res.json({ status: 'ok', message: 'unlinkRichMenuFromUser complete' })
+});
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
