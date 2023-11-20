@@ -6,19 +6,21 @@ const app = express()
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 const axios = require('axios')
-const line = require('@line/bot-sdk');
+const line = require('@line/bot-sdk')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
 const jwt = require('jsonwebtoken')
+const e = require('express')
 const secret = 'linebluezo'
 
 const config = {
-  channelAccessToken: "2TDhgW9gktEOWPWKcxj+1ir0vcYXezbDQAoI/xpPI+aOvY3CHmGHAwhAu6QoFs2B5eqWtmCaFxG8hFZfs6Upg21BHVPk7+jdNQKR8IngJYLcPhdV+ymxS1jpFt2FIWpnb231ZDo1gm3I9aPnacDqWAdB04t89/1O/w1cDnyilFU=",
-  channelSecret: "4da739fa6e17b8a7c7200d27acaa23b0",
+  channelAccessToken:
+    '2TDhgW9gktEOWPWKcxj+1ir0vcYXezbDQAoI/xpPI+aOvY3CHmGHAwhAu6QoFs2B5eqWtmCaFxG8hFZfs6Upg21BHVPk7+jdNQKR8IngJYLcPhdV+ymxS1jpFt2FIWpnb231ZDo1gm3I9aPnacDqWAdB04t89/1O/w1cDnyilFU=',
+  channelSecret: '4da739fa6e17b8a7c7200d27acaa23b0',
 }
 
-const client = new line.Client(config);
+const client = new line.Client(config)
 
 app.use(cors())
 
@@ -334,7 +336,7 @@ app.post('/login', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', student })
         return
       }
-      client.linkRichMenuToUser(lineID, "richmenu-7d6845b74c3ab4ee9930f9e626af79f3");
+      client.linkRichMenuToUser(lineID, 'richmenu-7d6845b74c3ab4ee9930f9e626af79f3')
       res.json({ status: 'ok', message: 'connected successfully', student })
     }
   )
@@ -357,7 +359,7 @@ app.post('/teacherlogin', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', teacher })
         return
       }
-      client.linkRichMenuToUser(lineID, "richmenu-dbc3db4798a5c797d2607651a74aa2ea");
+      client.linkRichMenuToUser(lineID, 'richmenu-dbc3db4798a5c797d2607651a74aa2ea')
       res.json({ status: 'ok', message: 'connected successfully', teacher })
     }
   )
@@ -470,8 +472,7 @@ app.put('/setactivitystatustrue', jsonParser, (req, res) => {
 app.post('/adminlogin', jsonParser, (req, res) => {
   let user = req.body.user
   let pass = req.body.pass
-  pass = bcrypt.hashSync(pass, saltRounds)
-  connection.query('SELECT * FROM admin WHERE user = ? AND pass = ?;', [user, pass], function (err, result, fields) {
+  connection.query('SELECT * FROM admin WHERE user = ?;', [user], function (err, result, fields) {
     if (err) {
       res.json({ status: 'error', message: err })
       return
@@ -480,8 +481,14 @@ app.post('/adminlogin', jsonParser, (req, res) => {
       res.json({ status: 'error', message: 'login failed', result })
       return
     }
-    let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
-    res.json({ status: 'ok', message: 'login successfully', result, token })
+    bcrypt.compare(pass, result[0].pass, function (err, isLogin) {
+      if (isLogin) {
+        let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
+        res.json({ status: 'ok', message: 'login successfully', result, token })
+      } else {
+        res.json({ status: 'error', message: 'login failed', result })
+      }
+    })
   })
 }) //done admin login
 
@@ -888,17 +895,17 @@ app.post('/lineenroll', jsonParser, (req, res) => {
     })
 })
 
-app.get('/unlink-richmenu/:lineID', jsonParser,(req, res) => {
+app.get('/unlink-richmenu/:lineID', jsonParser, (req, res) => {
   let lineID = req.params.lineID
-  client.unlinkRichMenuFromUser(lineID);
+  client.unlinkRichMenuFromUser(lineID)
   res.json({ status: 'ok', message: 'unlinkRichMenuFromUser complete' })
-});
+})
 
-app.get('/hash/:pass', jsonParser,(req, res) => {
+app.get('/hash/:pass', jsonParser, (req, res) => {
   let pass = req.params.pass
   pass = bcrypt.hashSync(pass, saltRounds)
   res.json({ status: 'ok', message: pass })
-});
+})
 
 app.listen(process.env.PORT || 3000)
 //connection.end()
