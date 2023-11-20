@@ -321,12 +321,10 @@ app.put('/teacherlineupdate', jsonParser, (req, res) => {
 app.post('/login', jsonParser, (req, res) => {
   let studentID = req.body.studentID
   let studentPassword = req.body.studentPassword
-  studentPassword = bcrypt.hashSync(studentPassword, saltRounds)
   let lineID = req.body.lineID
   connection.query(
-    //'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
-    'SELECT student.id, student.fname, student.lname, student.pass, faculty.name AS faculty FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ? AND student.pass = ?;',
-    [studentID, studentPassword],
+    'SELECT student.id, student.fname, student.lname, student.pass, faculty.name AS faculty FROM student JOIN faculty ON faculty.id = student.faculty WHERE student.id = ?;',
+    [studentID],
     function (err, student, fields) {
       if (err) {
         res.json({ status: 'error', message: err })
@@ -336,8 +334,14 @@ app.post('/login', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', student })
         return
       }
-      client.linkRichMenuToUser(lineID, 'richmenu-7d6845b74c3ab4ee9930f9e626af79f3')
-      res.json({ status: 'ok', message: 'connected successfully', student })
+      bcrypt.compare(studentPassword, student[0].pass, function (errbcrypt, isLogin) {
+        if (isLogin) {
+          client.linkRichMenuToUser(lineID, 'richmenu-7d6845b74c3ab4ee9930f9e626af79f3')
+          res.json({ status: 'ok', message: 'connected successfully', student })
+        } else {
+          res.json({ status: 'error', message: errbcrypt })
+        }
+      })
     }
   )
 }) //done
@@ -345,11 +349,10 @@ app.post('/login', jsonParser, (req, res) => {
 app.post('/teacherlogin', jsonParser, (req, res) => {
   let teacherID = req.body.teacherID
   let teacherPassword = req.body.teacherPassword
-  teacherPassword = bcrypt.hashSync(teacherPassword, saltRounds)
   let lineID = req.body.lineID
   connection.query(
-    'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
-    [teacherID, teacherPassword],
+    'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ?;',
+    [teacherID],
     function (err, teacher, fields) {
       if (err) {
         res.json({ status: 'error', message: err })
@@ -359,8 +362,14 @@ app.post('/teacherlogin', jsonParser, (req, res) => {
         res.json({ status: 'error', message: 'connected failed', teacher })
         return
       }
-      client.linkRichMenuToUser(lineID, 'richmenu-dbc3db4798a5c797d2607651a74aa2ea')
-      res.json({ status: 'ok', message: 'connected successfully', teacher })
+      bcrypt.compare(teacherPassword, teacher[0].pass, function (errbcrypt, isLogin) {
+        if (isLogin) {
+          client.linkRichMenuToUser(lineID, 'richmenu-dbc3db4798a5c797d2607651a74aa2ea')
+          res.json({ status: 'ok', message: 'connected successfully', teacher })
+        } else {
+          res.json({ status: 'error', message: errbcrypt })
+        }
+      })
     }
   )
 }) //done teacher
