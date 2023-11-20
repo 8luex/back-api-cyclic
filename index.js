@@ -7,6 +7,8 @@ const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 const axios = require('axios')
 const line = require('@line/bot-sdk');
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 
 const jwt = require('jsonwebtoken')
 const secret = 'linebluezo'
@@ -317,6 +319,7 @@ app.put('/teacherlineupdate', jsonParser, (req, res) => {
 app.post('/login', jsonParser, (req, res) => {
   let studentID = req.body.studentID
   let studentPassword = req.body.studentPassword
+  studentPassword = bcrypt.hashSync(studentPassword, saltRounds)
   let lineID = req.body.lineID
   connection.query(
     //'SELECT * FROM student WHERE student.id = ? AND student.pass = ?;',
@@ -340,6 +343,7 @@ app.post('/login', jsonParser, (req, res) => {
 app.post('/teacherlogin', jsonParser, (req, res) => {
   let teacherID = req.body.teacherID
   let teacherPassword = req.body.teacherPassword
+  teacherPassword = bcrypt.hashSync(teacherPassword, saltRounds)
   let lineID = req.body.lineID
   connection.query(
     'SELECT teacher.id, teacher.fname, teacher.lname, teacher.pass, faculty.name AS faculty FROM teacher JOIN faculty ON faculty.id = teacher.faculty WHERE teacher.id = ? AND teacher.pass = ?;',
@@ -466,6 +470,7 @@ app.put('/setactivitystatustrue', jsonParser, (req, res) => {
 app.post('/adminlogin', jsonParser, (req, res) => {
   let user = req.body.user
   let pass = req.body.pass
+  pass = bcrypt.hashSync(pass, saltRounds)
   connection.query('SELECT * FROM admin WHERE user = ? AND pass = ?;', [user, pass], function (err, result, fields) {
     if (err) {
       res.json({ status: 'error', message: err })
@@ -887,6 +892,12 @@ app.get('/unlink-richmenu/:lineID', jsonParser,(req, res) => {
   let lineID = req.params.lineID
   client.unlinkRichMenuFromUser(lineID);
   res.json({ status: 'ok', message: 'unlinkRichMenuFromUser complete' })
+});
+
+app.get('/hash/:pass', jsonParser,(req, res) => {
+  let pass = req.params.pass
+  pass = bcrypt.hashSync(pass, saltRounds)
+  res.json({ status: 'ok', message: pass })
 });
 
 app.listen(process.env.PORT || 3000)
