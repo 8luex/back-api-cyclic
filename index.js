@@ -481,12 +481,12 @@ app.post('/adminlogin', jsonParser, (req, res) => {
       res.json({ status: 'error', message: 'login failed', result })
       return
     }
-    bcrypt.compare(pass, result[0].pass, function (err, isLogin) {
+    bcrypt.compare(pass, result[0].pass, function (errbcrypt, isLogin) {
       if (isLogin) {
         let token = jwt.sign({ user: result[0].user }, secret, { expiresIn: '1h' })
         res.json({ status: 'ok', message: 'login successfully', result, token })
       } else {
-        res.json({ status: 'error', message: 'login failed', result })
+        res.json({ status: 'error', message: errbcrypt })
       }
     })
   })
